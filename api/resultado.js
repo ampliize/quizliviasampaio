@@ -1,6 +1,6 @@
 // POST /api/resultado
 // Recebe as respostas, recalcula o perfil (não confia no navegador), pede à OpenAI a devolutiva
-// personalizada e, se configurado, repassa o lead para um webhook (n8n, ManyChat, Make, Supabase...).
+// personalizada e registra o lead no mini CRM (Supabase), se configurado.
 import {
   PERFIS,
   QUALIFICADORAS,
@@ -8,6 +8,7 @@ import {
   precisaCuidado,
 } from '../assets/quiz-data.js';
 import { devolutivaPadrao } from '../assets/fallback.js';
+import { registrar } from './_supabase.js';
 
 const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 const MODELO = process.env.OPENAI_MODEL || 'gpt-4o-mini';
@@ -123,24 +124,6 @@ async function gerarDevolutivaIA(dados) {
   }
 }
 
-async function enviarLead(payload) {
-  const url = process.env.LEAD_WEBHOOK_URL;
-  if (!url) return;
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(process.env.LEAD_WEBHOOK_SECRET ? { 'X-Webhook-Secret': process.env.LEAD_WEBHOOK_SECRET } : {}),
-      },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(5000),
-    });
-  } catch (erro) {
-    console.error('Falha ao enviar lead para o webhook:', erro.message);
-  }
-}
-
 const limpar = (v, max = 120) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
 export async function POST(request) {
@@ -165,22 +148,18 @@ export async function POST(request) {
 
   const [devolutiva] = await Promise.all([
     gerarDevolutivaIA(dados).then((d) => d || devolutivaPadrao({ ...resultado, nome })),
-    enviarLead({
-      evento: 'quiz_concluido',
-      data: new Date().toISOString(),
+    registrar(corpo.sessao, 'resultado', {
+      etapa: 'resultado',
       nome,
       email: limpar(corpo.lead?.email),
       whatsapp: limpar(corpo.lead?.whatsapp, 30),
       consentimento: corpo.lead?.consentimento === true,
       perfil: resultado.perfil,
-      perfil_nome: PERFIS[resultado.perfil].nome,
       complementar: resultado.complementar,
       placar: Object.fromEntries(resultado.placar.map((b) => [b.id, b.forca])),
       qualificadoras,
-      // Só a sinalização — as respostas da triagem não saem daqui.
-      // Use para NÃO disparar sequência de venda para quem sinalizou risco.
+      // Só a sinalização: as respostas da triagem de cuidado não são gravadas.
       cuidado,
-      rastreio: corpo.rastreio || {},
     }),
   ]);
 

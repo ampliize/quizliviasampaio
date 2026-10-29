@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel do quiz · A-Livia-ndo</title>
+  <meta name="theme-color" content="#3A1640">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/crm.css">
+  <script type="module" src="/assets/crm.js"></script>
+</head>
+<body>
+  <main id="crm">
+    <section class="entrar" id="entrar">
+      <form id="form-senha" class="entrar-caixa">
+        <h1>Painel do quiz</h1>
+        <p>Onde cada pessoa parou no quiz da Lívia, do clique no link até a comunidade.</p>
+        <label for="senha">Senha da equipe</label>
+        <input id="senha" type="password" autocomplete="current-password" required>
+        <p class="erro" id="erro-senha" role="alert"></p>
+        <button class="btn" type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <section class="painel" id="painel" hidden>
+      <header class="cabeca">
+        <h1>Painel do quiz</h1>
+        <div class="filtros">
+          <div class="segmento" role="radiogroup" aria-label="Período" id="periodo">
+            <button type="button" role="radio" data-v="1">Hoje</button>
+            <button type="button" role="radio" data-v="7" aria-checked="true">7 dias</button>
+            <button type="button" role="radio" data-v="30">30 dias</button>
+            <button type="button" role="radio" data-v="90">90 dias</button>
+            <button type="button" role="radio" data-v="">Tudo</button>
+          </div>
+          <label class="sel">
+            <span class="sr">Origem</span>
+            <select id="origem"><option value="">Todas as origens</option></select>
+          </label>
+          <button class="btn-leve" type="button" id="atualizar">Atualizar</button>
+        </div>
+      </header>
+
+      <p class="aviso" id="aviso" role="status" hidden></p>
+
+      <section class="totais" id="totais" aria-label="Resumo do período"></section>
+
+      <div class="colunas">
+        <section class="bloco">
+          <h2>Funil</h2>
+          <p class="legenda">Quantas pessoas chegaram a cada etapa, e quantas se perderam desde a anterior.</p>
+          <ol class="funil" id="funil"></ol>
+        </section>
+        <section class="bloco">
+          <h2>Onde mais param</h2>
+          <p class="legenda">Pessoas que não chegaram ao resultado, pela última etapa que viram.</p>
+          <ol class="paradas" id="paradas"></ol>
+          <h2 class="sub">Perfis de quem concluiu</h2>
+          <ul class="perfis" id="perfis"></ul>
+        </section>
+      </div>
+
+      <section class="bloco">
+        <div class="leads-cabeca">
+          <h2>Leads</h2>
+          <div class="leads-acoes">
+            <input type="search" id="busca" placeholder="Buscar por nome, e-mail ou WhatsApp" aria-label="Buscar lead">
+            <button class="btn-leve" type="button" id="csv">Exportar CSV</button>
+          </div>
+        </div>
+        <div class="chips" role="radiogroup" aria-label="Filtrar leads" id="chips">
+          <button type="button" role="radio" data-f="todos" aria-checked="true">Todos</button>
+          <button type="button" role="radio" data-f="contato">Com contato</button>
+          <button type="button" role="radio" data-f="abandonaram">Pararam no meio</button>
+          <button type="button" role="radio" data-f="concluiram">Viram o resultado</button>
+          <button type="button" role="radio" data-f="comunidade">Clicaram na comunidade</button>
+          <button type="button" role="radio" data-f="cuidado">Sinalizaram risco</button>
+        </div>
+        <div class="tabela-rolagem">
+          <table class="leads">
+            <thead>
+              <tr><th>Pessoa</th><th>Situação</th><th>Perfil</th><th>Origem</th><th>Última atividade</th></tr>
+            </thead>
+            <tbody id="leads"></tbody>
+          </table>
+        </div>
+        <p class="legenda" id="contagem"></p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

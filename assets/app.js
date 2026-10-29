@@ -30,7 +30,16 @@ const estado = carregar() || {
   lead: { nome: '', email: '', whatsapp: '', consentimento: false },
   rastreio: {},
 };
+if (!estado.sessao) estado.sessao = novoId();
 capturarRastreio();
+
+function novoId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  // navegadores antigos: uuid v4 a partir de getRandomValues
+  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
+  );
+}
 
 function carregar() {
   try {
@@ -54,6 +63,36 @@ function capturarRastreio() {
   // ManyChat pode mandar o primeiro nome no link: ?nome={{first_name}}
   if (url.get('nome') && !estado.lead.nome) estado.lead.nome = url.get('nome').slice(0, 60);
 }
+
+// ---------- mini CRM: cada etapa alcançada vai para /api/evento ----------
+// sendBeacon sobrevive ao fechamento da aba, que é justamente quando a pessoa abandona.
+function registrarCrm(evento, extra = {}) {
+  const corpo = JSON.stringify({
+    sessao: estado.sessao,
+    evento,
+    rastreio: estado.rastreio,
+    momento: estado.qualificadoras.momento,
+    dispositivo: /iphone|ipad/i.test(navigator.userAgent) ? 'ios' : /android/i.test(navigator.userAgent) ? 'android' : 'desktop',
+    ...extra,
+  });
+  try {
+    if (navigator.sendBeacon?.('/api/evento', new Blob([corpo], { type: 'text/plain' }))) return;
+  } catch {
+    /* cai no fetch abaixo */
+  }
+  fetch('/api/evento', { method: 'POST', body: corpo, keepalive: true }).catch(() => {});
+}
+
+// Em que etapa do funil cada tela está (mesma ordem de supabase/schema.sql).
+function etapaDaTela(tela) {
+  if (tela.tipo === 'capa') return 'capa';
+  if (tela.tipo === 'resultado') return 'resultado';
+  if (tela.tipo === 'lead') return 'contato';
+  if (tela.tipo === 'introTriagem' || tela.tipo === 'triagem') return 'cuidado';
+  if (tela.tipo === 'qualificadora') return tela.chave === 'momento' ? 'momento' : 'qualificadoras';
+  return tela.bloco.id;
+}
+let ultimoPassoRegistrado = null;
 
 function rastrear(evento, dados = {}) {
   window.dataLayer = window.dataLayer || [];
@@ -121,6 +160,15 @@ function render() {
   if (estado.passo >= telas.length) estado.passo = telas.length - 1;
   const tela = telas[estado.passo];
   document.body.dataset.campo = tela.campo;
+  if (ultimoPassoRegistrado !== estado.passo) {
+    ultimoPassoRegistrado = estado.passo;
+    const perguntas = telas.filter(ehPergunta);
+    const n = perguntas.indexOf(tela);
+    // o resultado é registrado pelo servidor junto com o perfil; a capa vira "visita"
+    if (tela.tipo === 'capa') registrarCrm('visita', { etapa: 'capa' });
+    else if (tela.tipo !== 'resultado')
+      registrarCrm('etapa', { etapa: etapaDaTela(tela), ...(n >= 0 ? { pergunta: n + 1, total: perguntas.length } : {}) });
+  }
   atualizarTopo(telas, tela);
   const renderizadores = { capa, qualificadora, introBloco, escala, introTriagem, triagem, lead, resultado };
   app.innerHTML = '';
@@ -204,6 +252,7 @@ const continuar = (rotulo = 'Continuar') =>
 function capa() {
   const iniciar = () => {
     rastrear('quiz_inicio', estado.rastreio);
+    registrarCrm('inicio', { etapa: 'capa' });
     ir(1);
   };
   const nome = primeiroNome();
@@ -396,6 +445,7 @@ async function buscarResultado() {
     triagem: estado.triagem,
     lead: estado.lead,
     rastreio: estado.rastreio,
+    sessao: estado.sessao,
   };
   let dados;
   try {
@@ -462,6 +512,7 @@ function telaResultado(dados) {
     try {
       await gerarPdf({ dados, nome: estado.lead.nome, link });
       rastrear('quiz_pdf_baixado', { perfil: dados.perfil });
+      registrarCrm('pdf');
       botao.textContent = 'PDF baixado';
     } catch {
       botao.textContent = 'Não deu para gerar o PDF. Tocar para tentar de novo';
@@ -490,7 +541,14 @@ function telaResultado(dados) {
       h('p', {}, d.convite),
       h(
         'a',
-        { class: 'btn btn-claro', href: link, onclick: () => rastrear('quiz_clique_comunidade', { perfil: dados.perfil }) },
+        {
+          class: 'btn btn-claro',
+          href: link,
+          onclick: () => {
+            rastrear('quiz_clique_comunidade', { perfil: dados.perfil });
+            registrarCrm('comunidade');
+          },
+        },
         'Conhecer o A-Livia-ndo',
       ),
     );

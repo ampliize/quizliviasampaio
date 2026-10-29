@@ -13,22 +13,29 @@ if (existsSync(join(raiz, '.env'))) {
     if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
   }
 }
-const { POST } = await import('./api/resultado.js');
+const rotas = {
+  '/api/resultado': (await import('./api/resultado.js')).POST,
+  '/api/evento': (await import('./api/evento.js')).POST,
+  '/api/crm': (await import('./api/crm.js')).POST,
+};
 
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 const porta = Number(process.env.PORT) || 3000;
 
 createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  if (url.pathname === '/api/resultado' && req.method === 'POST') {
+  const rota = rotas[url.pathname];
+  if (rota && req.method === 'POST') {
     const partes = [];
     for await (const p of req) partes.push(p);
-    const resposta = await POST(new Request(url, { method: 'POST', headers: req.headers, body: Buffer.concat(partes) }));
+    const resposta = await rota(new Request(url, { method: 'POST', headers: req.headers, body: Buffer.concat(partes) }));
     res.writeHead(resposta.status, Object.fromEntries(resposta.headers));
     res.end(Buffer.from(await resposta.arrayBuffer()));
     return;
   }
-  const caminho = normalize(join(raiz, url.pathname === '/' ? 'index.html' : url.pathname));
+  // imita o cleanUrls da Vercel: /crm serve crm.html
+  const pedido = url.pathname === '/' ? 'index.html' : extname(url.pathname) ? url.pathname : `${url.pathname}.html`;
+  const caminho = normalize(join(raiz, pedido));
   if (!caminho.startsWith(raiz) || caminho.includes(`${raiz}api`)) {
     res.writeHead(404).end();
     return;
