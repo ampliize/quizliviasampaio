@@ -179,3 +179,26 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 
 .fecho{ margin-top:44px; font-family:var(--display); font-size:22px; line-height:1.35; }
 .resultado .miudo{ margin-top:22px; }
+
+/* ---------- glider da seleção (adaptado do Animated Radio, 21st.dev) ---------- */
+.opcoes{ position:relative; }
+.opcoes .opcao{ position:relative; z-index:1; }
+.opcoes .opcao[aria-pressed="true"]{ background:transparent; color:var(--papel); }
+.glider{
+  position:absolute; left:0; right:0; top:0; height:var(--h, 0); z-index:0;
+  border-radius:16px; background:var(--tinta); opacity:0;
+  transform:translateY(var(--y, 0));
+  transition:transform .5s cubic-bezier(.37,1.95,.66,.56), height .3s ease, opacity .15s ease;
+}
+.glider.on{ opacity:1; }
+.glider.sem-animacao{ transition:opacity .15s ease; }
+
+/* ---------- revelação do mapa (adaptado do Animated Chart, 21st.dev) ---------- */
+.mapa .barra i{ width:0; transition:width 1s cubic-bezier(.34,1.45,.64,1) var(--atraso, 0s); }
+.mapa.visivel .barra i{ width:var(--alvo); }
+.mapa .rot em{ opacity:0; transition:opacity .3s ease calc(var(--atraso, 0s) + .5s); }
+.mapa.visivel .rot em{ opacity:1; }
+@media (prefers-reduced-motion: reduce){
+  .mapa .barra i{ width:var(--alvo); }
+  .mapa .rot em{ opacity:1; }
+}

@@ -155,29 +155,46 @@ function borboleta() {
 }
 const primeiroNome = () => (estado.lead.nome || '').trim().split(/\s+/)[0];
 
+// Seleção com "glider" (adaptado do Animated Radio, 21st.dev): uma pílula desliza por trás das
+// opções até a escolhida, com uma curva que passa um pouco do ponto e volta.
 function listaOpcoes(opcoes, selecionado, aoEscolher) {
-  return h(
-    'div',
-    { class: 'opcoes', role: 'group' },
-    opcoes.map(({ valor, rotulo, antes }) =>
-      h(
-        'button',
-        {
-          class: 'opcao',
-          type: 'button',
-          'aria-pressed': String(selecionado === valor),
-          onclick: (e) => {
-            e.currentTarget.parentElement.querySelectorAll('.opcao').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-            e.currentTarget.setAttribute('aria-pressed', 'true');
-            // pausa curta para a marcação aparecer antes de avançar
-            setTimeout(() => aoEscolher(valor), 200);
-          },
+  const glider = h('span', { class: 'glider', 'aria-hidden': 'true' });
+  const grupo = h('div', { class: 'opcoes', role: 'group' }, glider);
+  const moverPara = (botao, animar) => {
+    glider.classList.toggle('sem-animacao', !animar);
+    glider.style.setProperty('--y', `${botao.offsetTop}px`);
+    glider.style.setProperty('--h', `${botao.offsetHeight}px`);
+    glider.classList.add('on');
+  };
+  let travado = false;
+  opcoes.forEach(({ valor, rotulo, antes }) => {
+    const botao = h(
+      'button',
+      {
+        class: 'opcao',
+        type: 'button',
+        'aria-pressed': String(selecionado === valor),
+        onclick: () => {
+          if (travado) return;
+          travado = true;
+          grupo.querySelectorAll('.opcao').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          botao.setAttribute('aria-pressed', 'true');
+          // sem escolha anterior, a pílula nasce no lugar; com escolha, ela desliza
+          moverPara(botao, glider.classList.contains('on'));
+          setTimeout(() => aoEscolher(valor), 420);
         },
-        antes,
-        h('span', {}, rotulo),
-      ),
-    ),
-  );
+      },
+      antes,
+      h('span', {}, rotulo),
+    );
+    grupo.appendChild(botao);
+  });
+  // volta de "Voltar": posiciona na resposta já dada assim que a tela estiver no DOM
+  requestAnimationFrame(() => {
+    const marcado = grupo.querySelector('.opcao[aria-pressed="true"]');
+    if (marcado) moverPara(marcado, false);
+  });
+  return grupo;
 }
 const deObjeto = (obj) => Object.entries(obj).map(([valor, rotulo]) => ({ valor, rotulo }));
 const continuar = (rotulo = 'Continuar') =>
@@ -412,18 +429,31 @@ function telaResultado(dados) {
   const d = dados.devolutiva;
   const link = linkComunidade(dados);
 
+  // Revelação do mapa (adaptado do Animated Chart, 21st.dev): as barras saem do zero com mola,
+  // uma após a outra, quando o mapa entra na tela; o número aparece na metade do movimento.
   const mapa = h(
     'div',
     { class: 'mapa' },
-    dados.placar.map((b) =>
+    dados.placar.map((b, i) =>
       h(
         'div',
-        { class: `linha${b.id === dados.perfil || b.id === dados.complementar ? ' foco' : ''}`, style: `--cor:var(--${b.id})` },
+        {
+          class: `linha${b.id === dados.perfil || b.id === dados.complementar ? ' foco' : ''}`,
+          style: `--cor:var(--${b.id});--alvo:${Math.max(b.forca, 4)}%;--atraso:${i * 0.12}s`,
+        },
         h('div', { class: 'rot' }, h('span', {}, b.nome), h('em', {}, `${b.forca}%`)),
-        h('div', { class: 'barra' }, h('i', { style: `width:${Math.max(b.forca, 4)}%` })),
+        h('div', { class: 'barra' }, h('i')),
       ),
     ),
   );
+  const revelar = () => mapa.classList.add('visivel');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entradas) => entradas.forEach((e) => e.isIntersecting && (revelar(), io.disconnect())),
+      { threshold: 0.5 },
+    );
+    io.observe(mapa);
+  } else revelar();
 
   const baixar = async (e) => {
     const botao = e.currentTarget;
