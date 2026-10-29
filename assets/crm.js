@@ -78,13 +78,22 @@ async function carregar() {
       body: JSON.stringify({ senha: lerSenha(), periodo: filtro.periodo, origem: filtro.origem }),
     });
     const json = await resp.json().catch(() => ({}));
+    if (resp.status === 404) {
+      mostrarEntrada('O servidor do painel não foi encontrado neste endereço. Confira se o deploy incluiu a pasta api/.');
+      return;
+    }
+    if (resp.status === 503) {
+      guardarSenha('');
+      mostrarEntrada(`${json.erro} Diagnóstico completo em /api/status.`);
+      return;
+    }
     if (resp.status === 401) {
       guardarSenha('');
       mostrarEntrada('Senha incorreta. Confira com quem configurou o painel.');
       return;
     }
     if (!resp.ok) {
-      avisar(json.erro || `O painel não respondeu (erro ${resp.status}). Tente de novo em instantes.`);
+      avisar(`${json.erro || `O painel não respondeu (erro ${resp.status}).`} Diagnóstico completo em /api/status.`);
       return;
     }
     avisar('');

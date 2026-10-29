@@ -5,8 +5,10 @@ import { crmAtivo, rpc } from './_supabase.js';
 const PERIODOS = { '1': 1, '7': 7, '30': 30, '90': 90 };
 
 function senhaConfere(recebida) {
-  const certa = process.env.CRM_SENHA;
+  // espaços sobrando ao colar a senha na Vercel ou no campo não devem travar o acesso
+  const certa = (process.env.CRM_SENHA || '').trim();
   if (!certa || typeof recebida !== 'string') return false;
+  recebida = recebida.trim();
   // compara hashes de mesmo tamanho para não vazar nada pelo tempo de resposta
   const h = (t) => createHash('sha256').update(t).digest();
   return timingSafeEqual(h(recebida), h(certa));
@@ -18,6 +20,9 @@ export async function POST(request) {
     corpo = await request.json();
   } catch {
     return Response.json({ erro: 'Requisição inválida.' }, { status: 400 });
+  }
+  if (!process.env.CRM_SENHA) {
+    return Response.json({ erro: 'A senha do painel ainda não foi cadastrada. Crie a variável CRM_SENHA na Vercel e faça um novo deploy.' }, { status: 503 });
   }
   if (!senhaConfere(corpo.senha)) {
     await new Promise((r) => setTimeout(r, 600));

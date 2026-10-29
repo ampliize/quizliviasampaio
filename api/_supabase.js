@@ -1,15 +1,19 @@
 // Acesso ao Supabase do mini CRM, só pelo servidor (service role nunca vai para o navegador).
 // Arquivos de /api que começam com "_" não viram rota na Vercel.
 
-export const crmAtivo = () => Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+// valores colados na Vercel costumam vir com espaço ou barra no fim
+const url = () => (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+const chave = () => (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+
+export const crmAtivo = () => Boolean(url() && chave());
 
 export async function rpc(funcao, args) {
-  const resp = await fetch(`${process.env.SUPABASE_URL}/rest/v1/rpc/${funcao}`, {
+  const resp = await fetch(`${url()}/rest/v1/rpc/${funcao}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      apikey: chave(),
+      Authorization: `Bearer ${chave()}`,
     },
     body: JSON.stringify(args),
     signal: AbortSignal.timeout(6000),

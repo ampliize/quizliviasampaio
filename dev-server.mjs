@@ -18,17 +18,18 @@ const rotas = {
   '/api/evento': (await import('./api/evento.js')).POST,
   '/api/crm': (await import('./api/crm.js')).POST,
 };
+const rotasGet = { '/api/status': (await import('./api/status.js')).GET };
 
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 const porta = Number(process.env.PORT) || 3000;
 
 createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const rota = rotas[url.pathname];
-  if (rota && req.method === 'POST') {
+  const rota = req.method === 'GET' ? rotasGet[url.pathname] : rotas[url.pathname];
+  if (rota && (req.method === 'POST' || req.method === 'GET')) {
     const partes = [];
     for await (const p of req) partes.push(p);
-    const resposta = await rota(new Request(url, { method: 'POST', headers: req.headers, body: Buffer.concat(partes) }));
+    const resposta = await rota(new Request(url, { method: req.method, headers: req.headers, body: req.method === 'POST' ? Buffer.concat(partes) : undefined }));
     res.writeHead(resposta.status, Object.fromEntries(resposta.headers));
     res.end(Buffer.from(await resposta.arrayBuffer()));
     return;
