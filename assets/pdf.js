@@ -2,15 +2,22 @@
 import { PERFIS } from './quiz-data.js';
 import { CONFIG } from './config.js';
 
+// Mesma paleta da página: berinjela + uma cor por área do mapa.
 const COR = {
-  vinho: [92, 36, 56],
-  rosa: [163, 67, 95],
-  rosaClaro: [232, 183, 194],
-  fundo: [251, 243, 239],
-  fundoAlt: [242, 221, 212],
-  texto: [58, 38, 42],
-  textoSuave: [122, 92, 96],
-  dourado: [122, 90, 44],
+  vinho: [58, 22, 64],
+  rosa: [78, 35, 86],
+  fundo: [251, 248, 244],
+  fundoAlt: [237, 230, 238],
+  texto: [43, 20, 51],
+  textoSuave: [94, 70, 100],
+  dourado: [94, 70, 100],
+};
+const COR_AREA = {
+  A: [201, 216, 232],
+  B: [235, 194, 201],
+  C: [238, 217, 166],
+  D: [205, 191, 227],
+  E: [188, 214, 196],
 };
 
 // As fontes padrão do PDF só cobrem Latin-1: troca o que fica fora disso por equivalentes simples.
@@ -96,15 +103,15 @@ export async function gerarPdf({ dados, nome, link }) {
   doc.setTextColor(253, 241, 238);
   doc.setFont('times', 'bold');
   doc.setFontSize(22);
-  doc.text('A-LIVIA-NDO', L / 2, 22, { align: 'center' });
+  doc.text('A-Livia-ndo', L / 2, 22, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(240, 195, 205);
-  doc.text(limpar('MAPA DE AUTOCONHECIMENTO  ·  LÍVIA SAMPAIO'), L / 2, 32, { align: 'center' });
+  doc.text(limpar('Mapa de autoconhecimento da Lívia Sampaio'), L / 2, 32, { align: 'center' });
   y = 60;
 
   paragrafo(d.saudacao, { tam: 12, cor: COR.textoSuave, estilo: 'italic', fonte: 'times', alinhar: 'center', esp: 5 });
-  paragrafo('SEU PERFIL EDUCATIVO DE HOJE', { tam: 8, cor: COR.dourado, estilo: 'bold', alinhar: 'center', esp: 3 });
+  paragrafo('Seu perfil educativo de hoje', { tam: 9.5, cor: COR.dourado, estilo: 'bold', alinhar: 'center', esp: 3 });
   paragrafo(perfil.nome, { tam: 22, cor: COR.vinho, estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 4 });
   paragrafo(`"${perfil.frase}"`, { tam: 12, cor: COR.rosa, estilo: 'italic', fonte: 'times', alinhar: 'center', esp: 3 });
   if (comp) paragrafo(`Trilha complementar: ${comp.trilha}`, { tam: 9.5, cor: COR.textoSuave, alinhar: 'center', esp: 3 });
@@ -129,7 +136,7 @@ export async function gerarPdf({ dados, nome, link }) {
 
   paragrafo(d.acolhimento, { tam: 11, esp: 4 });
 
-  titulo('O que esse padrão pode estar sinalizando');
+  titulo('O que esse padrão pode estar dizendo');
   d.oQueSinaliza.forEach((t) => paragrafo(t));
 
   // ---------- mapa ----------
@@ -144,19 +151,21 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.text(`${b.forca}%`, M + LARG, y + 3, { align: 'right' });
     doc.setFillColor(...COR.fundoAlt);
     doc.roundedRect(M, y + 5, LARG, 3, 1.5, 1.5, 'F');
-    doc.setFillColor(...(destaque ? COR.rosa : COR.rosaClaro));
-    doc.roundedRect(M, y + 5, Math.max((LARG * b.forca) / 100, 3), 3, 1.5, 1.5, 'F');
+    doc.setFillColor(...COR_AREA[b.id]);
+    doc.setDrawColor(...COR.texto);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(M, y + 5, Math.max((LARG * b.forca) / 100, 3), 3, 1.5, 1.5, destaque ? 'FD' : 'F');
     y += 12;
   });
-  paragrafo('Quanto maior a barra, mais fortalecida está a área. As destacadas são o seu ponto de partida.', { tam: 8.5, cor: COR.textoSuave });
+  paragrafo('Quanto mais cheia a barra, mais fortalecida está a área. As contornadas são o seu ponto de partida.', { tam: 8.5, cor: COR.textoSuave });
 
-  titulo('Forças que suas respostas mostram');
+  titulo('O que já é força em você');
   d.forcas.forEach((f) => paragrafo(`-  ${f}`, { esp: 1.5 }));
 
-  titulo(`Exercício de 3 minutos: ${d.exercicio.titulo}`);
+  titulo(`Para fazer agora, em 3 minutos: ${d.exercicio.titulo}`);
   d.exercicio.passos.forEach((p, i) => paragrafo(`${i + 1}.  ${p}`, { esp: 2 }));
 
-  titulo('Seu próximo passo (gratuito)');
+  titulo('Nos próximos 7 dias');
   paragrafo(d.proximoPasso);
 
   // ---------- convite ----------
@@ -170,7 +179,7 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFillColor(...COR.vinho);
     doc.roundedRect(M, topoCaixa, LARG, alt, 5, 5, 'F');
     y += 9;
-    paragrafo(`SUA TRILHA: ${perfil.trilha}`.toUpperCase(), { tam: 8, cor: [232, 196, 138], estilo: 'bold', alinhar: 'center', esp: 2 });
+    paragrafo(`Sua trilha: ${perfil.trilha.toLowerCase()}`, { tam: 9.5, cor: [232, 196, 138], estilo: 'bold', alinhar: 'center', esp: 2 });
     paragrafo('Continue essa jornada no A-Livia-ndo', { tam: 14, cor: [253, 241, 238], estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 2 });
     paragrafo(d.convite, { cor: [243, 215, 221], x: M + 8, larg: LARG - 16, esp: 3 });
     const bw = 104;
@@ -180,7 +189,7 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10.5);
     doc.setTextColor(...COR.vinho);
-    doc.text('Conhecer minha trilha no A-Livia-ndo', L / 2, y + 7, { align: 'center' });
+    doc.text('Conhecer o A-Livia-ndo', L / 2, y + 7, { align: 'center' });
     doc.link(bx, y, bw, 11, { url: link });
     y = topoCaixa + alt + 6;
   }

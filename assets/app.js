@@ -15,8 +15,7 @@ import { gerarPdf } from './pdf.js';
 const app = document.getElementById('app');
 const topo = document.getElementById('topo');
 const btnVoltar = document.getElementById('voltar');
-const barra = document.getElementById('progresso-barra');
-const progresso = document.getElementById('progresso');
+const trilha = document.getElementById('progresso');
 const contador = document.getElementById('contador');
 
 const CHAVE_SALVO = 'aliviando_quiz_v1';
@@ -63,25 +62,24 @@ function rastrear(evento, dados = {}) {
 }
 
 // ---------- roteiro de telas ----------
-// O roteiro é recalculado a cada passo porque depende do momento de vida (bloco E some para solteiras).
+// Cada tela pertence a um "trecho" (a parte do quiz). O trecho decide a cor de fundo
+// e o segmento da barra de progresso. O roteiro depende do momento de vida (bloco E some para solteiras).
 function roteiro() {
-  const telas = [{ tipo: 'capa' }];
-  telas.push({ tipo: 'qualificadora', chave: 'momento' });
+  const telas = [{ tipo: 'capa', trecho: null, campo: 'escuro' }];
+  telas.push({ tipo: 'qualificadora', chave: 'momento', trecho: 'inicio', campo: 'neutro' });
   blocosAplicaveis(estado.qualificadoras.momento).forEach((bloco) => {
-    telas.push({ tipo: 'introBloco', bloco });
-    bloco.perguntas.forEach((texto, i) => telas.push({ tipo: 'escala', bloco, i, texto }));
+    telas.push({ tipo: 'introBloco', bloco, trecho: bloco.id, campo: bloco.id });
+    bloco.perguntas.forEach((texto, i) => telas.push({ tipo: 'escala', bloco, i, texto, trecho: bloco.id, campo: bloco.id }));
   });
-  ['desejo', 'formato', 'tempo', 'frase'].forEach((chave) => telas.push({ tipo: 'qualificadora', chave }));
-  telas.push({ tipo: 'introTriagem' });
-  Object.keys(TRIAGEM).forEach((chave) => telas.push({ tipo: 'triagem', chave }));
-  telas.push({ tipo: 'lead' });
-  telas.push({ tipo: 'resultado' });
+  ['desejo', 'formato', 'tempo', 'frase'].forEach((chave) => telas.push({ tipo: 'qualificadora', chave, trecho: 'fim', campo: 'neutro' }));
+  telas.push({ tipo: 'introTriagem', trecho: 'fim', campo: 'papel' });
+  Object.keys(TRIAGEM).forEach((chave) => telas.push({ tipo: 'triagem', chave, trecho: 'fim', campo: 'papel' }));
+  telas.push({ tipo: 'lead', trecho: 'fim', campo: 'neutro' });
+  telas.push({ tipo: 'resultado', trecho: null, campo: 'escuro' });
   return telas;
 }
 
-function perguntasRespondiveis(telas) {
-  return telas.filter((t) => ['escala', 'qualificadora', 'triagem'].includes(t.tipo));
-}
+const ehPergunta = (t) => ['escala', 'qualificadora', 'triagem'].includes(t.tipo);
 
 function ir(passo) {
   estado.passo = Math.max(0, passo);
@@ -91,28 +89,38 @@ function ir(passo) {
 }
 
 btnVoltar.addEventListener('click', () => {
-  const telas = roteiro();
-  if (telas[estado.passo]?.tipo === 'resultado') return;
+  if (roteiro()[estado.passo]?.tipo === 'resultado') return;
   ir(estado.passo - 1);
 });
 
 function atualizarTopo(telas, tela) {
-  const semTopo = tela.tipo === 'capa' || tela.tipo === 'resultado';
-  topo.hidden = semTopo;
-  if (semTopo) return;
-  const perguntas = perguntasRespondiveis(telas);
+  topo.hidden = !tela.trecho;
+  if (!tela.trecho) return;
+  btnVoltar.disabled = estado.passo <= 1;
+
+  const perguntas = telas.filter(ehPergunta);
   const atual = perguntas.indexOf(tela);
-  const feitas = perguntas.filter((t) => telas.indexOf(t) < estado.passo).length;
-  const pct = Math.round((feitas / perguntas.length) * 100);
-  barra.style.width = `${pct}%`;
-  progresso.setAttribute('aria-valuenow', String(pct));
   contador.textContent = atual >= 0 ? `${atual + 1} de ${perguntas.length}` : '';
+
+  // um segmento por trecho, com largura proporcional ao número de perguntas
+  const trechos = [...new Set(telas.filter((t) => t.trecho).map((t) => t.trecho))];
+  trilha.innerHTML = '';
+  let feitasTotal = 0;
+  trechos.forEach((id) => {
+    const doTrecho = perguntas.filter((t) => t.trecho === id);
+    const feitas = doTrecho.filter((t) => telas.indexOf(t) < estado.passo).length;
+    feitasTotal += feitas;
+    const seg = h('span', { style: `--peso:${doTrecho.length || 1};--feito:${(feitas / (doTrecho.length || 1)) * 100}%` }, h('i'));
+    trilha.appendChild(seg);
+  });
+  trilha.setAttribute('aria-valuenow', String(Math.round((feitasTotal / perguntas.length) * 100)));
 }
 
 function render() {
   const telas = roteiro();
   if (estado.passo >= telas.length) estado.passo = telas.length - 1;
   const tela = telas[estado.passo];
+  document.body.dataset.campo = tela.campo;
   atualizarTopo(telas, tela);
   const renderizadores = { capa, qualificadora, introBloco, escala, introTriagem, triagem, lead, resultado };
   app.innerHTML = '';
@@ -131,25 +139,27 @@ function h(tag, attrs = {}, ...filhos) {
     else if (v === true) el.setAttribute(k, '');
     else if (v !== false && v != null) el.setAttribute(k, v);
   });
-  filhos.flat().forEach((f) => f != null && el.append(f.nodeType ? f : document.createTextNode(f)));
+  filhos.flat().forEach((f) => f != null && f !== false && el.append(f.nodeType ? f : document.createTextNode(f)));
   return el;
 }
-const borboleta = (cls = 'marca') => {
+function borboleta() {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('class', `bfly ${cls}`);
+  svg.setAttribute('class', 'borboleta');
+  svg.setAttribute('viewBox', '0 0 100 70');
   svg.setAttribute('aria-hidden', 'true');
   const use = document.createElementNS(ns, 'use');
-  use.setAttribute('href', '#butterfly');
+  use.setAttribute('href', '#borboleta');
   svg.appendChild(use);
   return svg;
-};
+}
+const primeiroNome = () => (estado.lead.nome || '').trim().split(/\s+/)[0];
 
 function listaOpcoes(opcoes, selecionado, aoEscolher) {
   return h(
     'div',
     { class: 'opcoes', role: 'group' },
-    opcoes.map(([valor, rotulo]) =>
+    opcoes.map(({ valor, rotulo, antes }) =>
       h(
         'button',
         {
@@ -159,16 +169,19 @@ function listaOpcoes(opcoes, selecionado, aoEscolher) {
           onclick: (e) => {
             e.currentTarget.parentElement.querySelectorAll('.opcao').forEach((b) => b.setAttribute('aria-pressed', 'false'));
             e.currentTarget.setAttribute('aria-pressed', 'true');
-            // pequena pausa para a pessoa ver a marcação antes de avançar
-            setTimeout(() => aoEscolher(valor), 180);
+            // pausa curta para a marcação aparecer antes de avançar
+            setTimeout(() => aoEscolher(valor), 200);
           },
         },
-        h('span', { class: 'bolinha' }),
-        rotulo,
+        antes,
+        h('span', {}, rotulo),
       ),
     ),
   );
 }
+const deObjeto = (obj) => Object.entries(obj).map(([valor, rotulo]) => ({ valor, rotulo }));
+const continuar = (rotulo = 'Continuar') =>
+  h('div', { class: 'acoes' }, h('button', { class: 'btn', type: 'button', onclick: () => ir(estado.passo + 1) }, rotulo));
 
 // ---------- telas ----------
 function capa() {
@@ -176,40 +189,41 @@ function capa() {
     rastrear('quiz_inicio', estado.rastreio);
     ir(1);
   };
+  const nome = primeiroNome();
   return h(
     'section',
     { class: 'capa' },
     borboleta(),
-    h('p', { class: 'eyebrow' }, 'Análise gratuita de perfil'),
-    h('h1', {}, 'Qual padrão hoje mais interfere na forma como ', h('em', {}, 'você se escolhe'), '?'),
-    h('p', { class: 'sub' }, 'Um mapa de autoconhecimento para descobrir qual área da sua vida merece mais atenção neste momento.'),
+    h('p', { class: 'nome-marca' }, 'A-Livia-ndo'),
+    h('h1', {}, nome ? `${nome}, qual padrão hoje mais pesa na forma como você se escolhe?` : 'Qual padrão hoje mais pesa na forma como você se escolhe?'),
+    h('p', { class: 'sub' }, 'Responda com calma e descubra por onde começar a cuidar de você agora.'),
     h(
       'ul',
-      { class: 'beneficios' },
-      h('li', {}, 'Leva cerca de 5 minutos'),
-      h('li', {}, 'Resultado personalizado na hora'),
-      h('li', {}, 'Seu mapa completo em PDF, com um exercício prático'),
+      { class: 'como' },
+      h('li', { style: '--cor:var(--A)' }, 'Cerca de 5 minutos, uma frase por vez'),
+      h('li', { style: '--cor:var(--B)' }, 'Seu resultado aparece na hora'),
+      h('li', { style: '--cor:var(--C)' }, 'Você leva o mapa completo em PDF, com um exercício'),
     ),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-primario', type: 'button', onclick: iniciar, autofocus: true }, 'Começar minha análise')),
+    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-claro', type: 'button', onclick: iniciar }, 'Começar')),
     h(
       'p',
-      { class: 'aviso' },
-      'Responda pensando na sua realidade atual, não no que você gostaria de responder. O resultado é educativo e serve como ponto de partida para o autoconhecimento. Ele não substitui avaliação de psicóloga, psiquiatra, advogada ou outro profissional.',
+      { class: 'miudo' },
+      'O resultado é educativo, um ponto de partida para se conhecer melhor. Não substitui psicóloga, psiquiatra, advogada ou outro profissional.',
     ),
-    h('p', { class: 'assinatura' }, 'Lívia Sampaio'),
+    h('div', { class: 'assina' }, h('span', { class: 'foto', 'aria-hidden': 'true' }, 'L'), h('span', {}, h('strong', {}, 'Lívia Sampaio'), CONFIG.instagram)),
   );
 }
 
 function qualificadora({ chave }) {
   const q = QUALIFICADORAS[chave];
-  const dica = chave === 'momento' ? 'Isso ajuda a deixar as próximas perguntas e o seu resultado mais certeiros.' : null;
+  const dica = chave === 'momento' ? 'Assim as próximas perguntas e o seu resultado ficam mais certeiros.' : null;
   return h(
     'section',
     { class: 'pergunta' },
-    h('span', { class: 'eyebrow bloco' }, 'Seu momento'),
+    h('p', { class: 'area' }, chave === 'momento' ? 'Antes de começar' : 'Sobre o seu momento'),
     h('h2', {}, q.pergunta),
     dica && h('p', { class: 'dica' }, dica),
-    listaOpcoes(Object.entries(q.opcoes), estado.qualificadoras[chave], (valor) => {
+    listaOpcoes(deObjeto(q.opcoes), estado.qualificadoras[chave], (valor) => {
       estado.qualificadoras[chave] = valor;
       ir(estado.passo + 1);
     }),
@@ -217,16 +231,16 @@ function qualificadora({ chave }) {
 }
 
 function introBloco({ bloco }) {
-  const indice = blocosAplicaveis(estado.qualificadoras.momento).indexOf(bloco) + 1;
+  const blocos = blocosAplicaveis(estado.qualificadoras.momento);
+  const indice = blocos.indexOf(bloco) + 1;
   return h(
     'section',
-    { class: 'intro-bloco' },
-    borboleta(),
-    h('p', { class: 'eyebrow' }, `Parte ${indice}`),
+    { class: 'abertura' },
+    h('p', { class: 'parte' }, `Parte ${indice} de ${blocos.length}`),
     h('h2', {}, bloco.nome),
-    h('p', {}, bloco.intro),
-    indice === 1 && h('p', {}, 'Para cada frase, escolha o que mais se aproxima do que acontece hoje. Não existe resposta certa — existe a resposta honesta.'),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-primario', type: 'button', onclick: () => ir(estado.passo + 1), autofocus: true }, 'Continuar')),
+    h('p', { class: 'intro' }, bloco.intro),
+    indice === 1 && h('p', { class: 'instrucao' }, 'Para cada frase, marque o que mais se parece com a sua vida hoje. Não existe resposta certa, só a honesta.'),
+    continuar(),
   );
 }
 
@@ -235,14 +249,15 @@ function escala({ bloco, i, texto }) {
     bloco.id === 'E' && estado.qualificadoras.momento === 'recuperando'
       ? 'Se a relação já terminou, pense em como ela era nos últimos meses.'
       : null;
+  const pontos = (n) => h('span', { class: 'freq', 'aria-hidden': 'true' }, [0, 1, 2, 3].map((k) => h('b', { class: k < n ? 'on' : '' })));
   return h(
     'section',
     { class: 'pergunta' },
-    h('span', { class: 'eyebrow bloco' }, bloco.nome),
+    h('p', { class: 'area' }, `${bloco.nome}, frase ${i + 1} de ${bloco.perguntas.length}`),
     h('h2', {}, texto),
     dica && h('p', { class: 'dica' }, dica),
     listaOpcoes(
-      ESCALA.map((e) => [e.valor, e.rotulo]),
+      ESCALA.map((e) => ({ valor: e.valor, rotulo: e.rotulo, antes: pontos(e.valor) })),
       estado.respostas[bloco.id][i],
       (valor) => {
         estado.respostas[bloco.id][i] = valor;
@@ -255,16 +270,15 @@ function escala({ bloco, i, texto }) {
 function introTriagem() {
   return h(
     'section',
-    { class: 'intro-bloco' },
-    borboleta(),
-    h('p', { class: 'eyebrow' }, 'Cuidado com você'),
-    h('h2', {}, 'Quatro perguntas rápidas'),
+    { class: 'abertura' },
+    h('p', { class: 'parte' }, 'Antes do resultado'),
+    h('h2', {}, 'Quatro perguntas para cuidar de você'),
     h(
       'p',
-      {},
-      'As próximas perguntas existem para cuidar melhor de você e não entram no seu resultado. Você pode escolher não responder. Se houver ameaça, violência ou risco imediato, procure ajuda e priorize sua segurança.',
+      { class: 'intro' },
+      'Elas não entram no seu resultado e você pode escolher não responder. Se houver ameaça, violência ou risco agora, procure ajuda e priorize sua segurança.',
     ),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-primario', type: 'button', onclick: () => ir(estado.passo + 1), autofocus: true }, 'Continuar')),
+    continuar(),
   );
 }
 
@@ -273,9 +287,9 @@ function triagem({ chave }) {
   return h(
     'section',
     { class: 'pergunta' },
-    h('span', { class: 'eyebrow bloco' }, 'Cuidado com você'),
+    h('p', { class: 'area' }, 'Cuidado com você'),
     h('h2', {}, q.pergunta),
-    listaOpcoes(Object.entries(q.opcoes), estado.triagem[chave], (valor) => {
+    listaOpcoes(deObjeto(q.opcoes), estado.triagem[chave], (valor) => {
       estado.triagem[chave] = valor;
       ir(estado.passo + 1);
     }),
@@ -286,7 +300,6 @@ function lead() {
   const form = h(
     'form',
     {
-      class: 'cartao',
       novalidate: true,
       onsubmit: (e) => {
         e.preventDefault();
@@ -304,42 +317,37 @@ function lead() {
         ir(estado.passo + 1);
       },
     },
-    h('p', { class: 'eyebrow' }, 'Quase lá'),
-    h('h2', { style: 'font-size:24px;margin-top:8px' }, 'Seu mapa está pronto para ser gerado'),
-    h('p', { class: 'dica', style: 'margin-top:10px;color:var(--ink-soft)' }, 'Como você quer ser chamada no seu resultado?'),
-    h('label', { class: 'campo' }, h('span', {}, 'Seu primeiro nome'), h('input', { name: 'nome', autocomplete: 'given-name', required: true, maxlength: '60', value: estado.lead.nome, autofocus: true })),
-    h('label', { class: 'campo' }, h('span', {}, 'E-mail (opcional)'), h('input', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', maxlength: '120', value: estado.lead.email })),
-    h('label', { class: 'campo' }, h('span', {}, 'WhatsApp (opcional)'), h('input', { name: 'whatsapp', type: 'tel', autocomplete: 'tel', inputmode: 'tel', maxlength: '30', placeholder: '(00) 00000-0000', value: estado.lead.whatsapp })),
+    h('h2', {}, 'Pronto. Como você quer ser chamada no seu resultado?'),
+    h('label', { class: 'campo-form' }, h('span', {}, 'Primeiro nome'), h('input', { name: 'nome', autocomplete: 'given-name', required: true, maxlength: '60', value: estado.lead.nome, autofocus: true })),
+    h('label', { class: 'campo-form' }, h('span', {}, 'E-mail, se quiser receber conteúdos'), h('input', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', maxlength: '120', value: estado.lead.email })),
+    h('label', { class: 'campo-form' }, h('span', {}, 'WhatsApp, se preferir'), h('input', { name: 'whatsapp', type: 'tel', autocomplete: 'tel', inputmode: 'tel', maxlength: '30', placeholder: '(00) 00000-0000', value: estado.lead.whatsapp })),
     h(
       'label',
       { class: 'check' },
       h('input', { type: 'checkbox', name: 'consentimento', checked: estado.lead.consentimento }),
       h('span', {}, 'Quero receber meu resultado e conteúdos da Lívia sobre autoestima e relacionamentos. Posso cancelar quando quiser.'),
     ),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, 'Ver meu resultado')),
-    h(
-      'p',
-      { class: 'aviso' },
-      'Usamos seus dados apenas para personalizar o resultado e, se você autorizar, para enviar conteúdos da Lívia. As respostas de cuidado não são compartilhadas.',
-    ),
+    h('div', { class: 'acoes' }, h('button', { class: 'btn', type: 'submit' }, 'Ver meu resultado')),
+    h('p', { class: 'miudo', style: 'margin-top:18px' }, 'Seus dados servem para personalizar o resultado e, se você autorizar, para receber conteúdos. As respostas de cuidado ficam só com você.'),
   );
   return h('section', { class: 'pergunta' }, form);
 }
 
 // ---------- resultado ----------
 const MENSAGENS_ESPERA = [
-  'Lendo suas respostas com carinho…',
-  'Montando o seu mapa de padrões…',
+  'Lendo suas respostas…',
+  'Montando o seu mapa…',
   'Escolhendo um exercício para o seu momento…',
   'Preparando o seu PDF…',
 ];
 
 function resultado() {
+  const nome = primeiroNome();
   const el = h(
     'section',
     { class: 'carregando' },
     borboleta(),
-    h('h2', {}, `${estado.lead.nome ? estado.lead.nome + ', s' : 'S'}eu resultado está quase pronto`),
+    h('h2', {}, nome ? `${nome}, respira. Seu mapa está quase pronto.` : 'Respira. Seu mapa está quase pronto.'),
     h('p', { id: 'espera' }, MENSAGENS_ESPERA[0]),
   );
   let i = 0;
@@ -353,6 +361,7 @@ function resultado() {
     .then((dados) => {
       clearInterval(giro);
       rastrear('quiz_concluido', { perfil: dados.perfil, complementar: dados.complementar, cuidado: dados.cuidado });
+      document.body.dataset.campo = 'papel';
       app.innerHTML = '';
       const tela = telaResultado(dados);
       tela.classList.add('tela');
@@ -409,9 +418,9 @@ function telaResultado(dados) {
     dados.placar.map((b) =>
       h(
         'div',
-        { class: `linha${b.id === dados.perfil || b.id === dados.complementar ? ' destaque' : ''}` },
-        h('div', { class: 'rotulo' }, h('strong', {}, b.nome), h('span', {}, `${b.forca}%`)),
-        h('div', { class: 'trilho' }, h('span', { style: `width:${Math.max(b.forca, 3)}%` })),
+        { class: `linha${b.id === dados.perfil || b.id === dados.complementar ? ' foco' : ''}`, style: `--cor:var(--${b.id})` },
+        h('div', { class: 'rot' }, h('span', {}, b.nome), h('em', {}, `${b.forca}%`)),
+        h('div', { class: 'barra' }, h('i', { style: `width:${Math.max(b.forca, 4)}%` })),
       ),
     ),
   );
@@ -423,85 +432,76 @@ function telaResultado(dados) {
     try {
       await gerarPdf({ dados, nome: estado.lead.nome, link });
       rastrear('quiz_pdf_baixado', { perfil: dados.perfil });
+      botao.textContent = 'PDF baixado';
+    } catch {
+      botao.textContent = 'Não deu para gerar o PDF. Tocar para tentar de novo';
     } finally {
       botao.disabled = false;
-      botao.textContent = 'Baixar meu resultado em PDF';
     }
   };
 
-  const cuidado = dados.cuidado
-    ? h(
-        'section',
-        { class: 'cartao cuidado' },
-        h('h3', {}, 'Antes de tudo: você importa'),
-        h(
-          'p',
-          {},
-          'Algumas das suas respostas mostram que você pode estar vivendo uma situação difícil. Sua segurança vem primeiro. Se você estiver em perigo, procure um serviço de emergência (190) ou uma rede de apoio de confiança.',
-        ),
-        h(
-          'p',
-          {},
-          `No Brasil, o ${CONFIG.contatoCuidado} acolhe e orienta mulheres em situação de violência — é gratuito, sigiloso e funciona 24 horas.`,
-        ),
-        h('div', { class: 'acoes' }, h('a', { class: 'btn btn-primario', href: 'tel:180' }, `Ligar para o ${CONFIG.contatoCuidado}`)),
-      )
-    : null;
+  const cuidado =
+    dados.cuidado &&
+    h(
+      'section',
+      { class: 'cuidado' },
+      h('h3', {}, 'Antes de tudo: sua segurança'),
+      h('p', {}, 'Algumas respostas mostram que você pode estar vivendo algo difícil. Se estiver em perigo agora, ligue 190 ou procure alguém de confiança.'),
+      h('p', {}, `O ${CONFIG.contatoCuidado} acolhe e orienta mulheres em situação de violência. É gratuito, sigiloso e funciona 24 horas.`),
+      h('a', { class: 'btn', href: 'tel:180' }, `Ligar para o ${CONFIG.contatoCuidado}`),
+    );
 
-  const convite = dados.cuidado
-    ? null
-    : h(
-        'section',
-        { class: 'destaque-escuro' },
-        h('p', { class: 'eyebrow', style: 'color:#e8c48a' }, `Sua trilha: ${perfil.trilha}`),
-        h('h3', { style: 'margin-top:8px' }, 'Continue essa jornada no A-Livia-ndo'),
-        h('p', {}, d.convite),
-        h(
-          'a',
-          { class: 'btn', href: link, onclick: () => rastrear('quiz_clique_comunidade', { perfil: dados.perfil }) },
-          'Conhecer minha trilha no A-Livia-ndo',
-        ),
-      );
+  const convite =
+    !dados.cuidado &&
+    h(
+      'section',
+      { class: 'convite' },
+      h('h3', {}, `Sua trilha de ${perfil.trilha.toLowerCase()} continua no A-Livia-ndo`),
+      h('p', {}, d.convite),
+      h(
+        'a',
+        { class: 'btn btn-claro', href: link, onclick: () => rastrear('quiz_clique_comunidade', { perfil: dados.perfil }) },
+        'Conhecer o A-Livia-ndo',
+      ),
+    );
 
   return h(
     'article',
-    { class: 'resultado' },
+    { class: 'resultado', style: `--cor-perfil:var(--${dados.perfil})` },
     h(
-      'div',
-      { class: 'topo-resultado' },
-      borboleta(),
+      'header',
+      { class: 'resultado-topo' },
       h('p', { class: 'saudacao' }, d.saudacao),
-      h('p', { class: 'eyebrow', style: 'margin-top:14px' }, 'Seu perfil educativo de hoje'),
       h('h1', {}, perfil.nome),
-      h('p', { class: 'frase-perfil' }, `“${perfil.frase}”`),
-      comp && h('span', { class: 'comp' }, `Trilha complementar: ${comp.trilha}`),
+      h('p', { class: 'frase' }, perfil.frase),
+      comp && h('p', { class: 'comp' }, `Seu momento também conversa com a trilha de ${comp.trilha.toLowerCase()}.`),
     ),
     cuidado,
-    h('section', { class: 'cartao' }, h('p', {}, d.acolhimento)),
-    h('section', {}, h('h3', {}, 'O que esse padrão pode estar sinalizando'), d.oQueSinaliza.map((t) => h('p', {}, t))),
+    h('p', { class: 'acolhe' }, d.acolhimento),
+    h('section', { class: 'bloco' }, h('h3', {}, 'O que esse padrão pode estar dizendo'), d.oQueSinaliza.map((t) => h('p', {}, t))),
     h(
       'section',
-      { class: 'cartao' },
+      { class: 'bloco' },
       h('h3', {}, 'Seu mapa de hoje'),
       mapa,
-      h('p', { class: 'mapa-legenda' }, 'Quanto maior a barra, mais fortalecida está a área. As destacadas são o seu ponto de partida.'),
+      h('p', { class: 'miudo', style: 'margin-top:12px' }, 'Quanto mais cheia a barra, mais fortalecida está a área. As contornadas são o seu ponto de partida.'),
     ),
-    h('section', {}, h('h3', {}, 'Forças que suas respostas mostram'), h('ul', { class: 'forcas' }, d.forcas.map((f) => h('li', {}, f)))),
+    h('section', { class: 'bloco' }, h('h3', {}, 'O que já é força em você'), h('ul', { class: 'forcas' }, d.forcas.map((f) => h('li', {}, f)))),
     h(
       'section',
-      { class: 'cartao' },
-      h('p', { class: 'eyebrow' }, 'Exercício de 3 minutos'),
-      h('h3', { style: 'margin-top:6px' }, d.exercicio.titulo),
-      h('ol', { class: 'passos' }, d.exercicio.passos.map((p) => h('li', {}, p))),
+      { class: 'exercicio' },
+      h('p', { class: 'tempo' }, 'Para fazer agora, em 3 minutos'),
+      h('h3', {}, d.exercicio.titulo),
+      h('ol', {}, d.exercicio.passos.map((p) => h('li', {}, p))),
     ),
-    h('section', {}, h('h3', {}, 'Seu próximo passo (gratuito)'), h('p', {}, d.proximoPasso)),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-secundario', type: 'button', onclick: baixar }, 'Baixar meu resultado em PDF')),
+    h('section', { class: 'bloco' }, h('h3', {}, 'Nos próximos 7 dias'), h('p', {}, d.proximoPasso)),
+    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-contorno', type: 'button', onclick: baixar }, 'Baixar meu mapa em PDF')),
     convite,
-    h('section', {}, h('p', { class: 'frase-final' }, d.fraseFinal)),
+    h('p', { class: 'fecho' }, d.fraseFinal),
     h(
       'p',
-      { class: 'aviso', style: 'text-align:center' },
-      'Este resultado é educativo e não é um diagnóstico. Ele não substitui acompanhamento psicológico, médico ou jurídico. Em situações de risco, ligue 180 ou 190.',
+      { class: 'miudo' },
+      'Este resultado é educativo e não é um diagnóstico. Não substitui acompanhamento psicológico, médico ou jurídico. Em situação de risco, ligue 180 ou 190.',
     ),
   );
 }
