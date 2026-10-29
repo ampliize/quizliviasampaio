@@ -2,22 +2,22 @@
 import { PERFIS } from './quiz-data.js';
 import { CONFIG } from './config.js';
 
-// Mesma paleta da página: berinjela + uma cor por área do mapa.
+// Mesma paleta da página: bordô e dourado + uma cor por área do mapa.
 const COR = {
-  vinho: [58, 22, 64],
-  rosa: [78, 35, 86],
-  fundo: [251, 248, 244],
-  fundoAlt: [237, 230, 238],
-  texto: [43, 20, 51],
-  textoSuave: [94, 70, 100],
-  dourado: [94, 70, 100],
+  vinho: [74, 15, 31],
+  rosa: [94, 26, 44],
+  fundo: [246, 241, 236],
+  fundoAlt: [239, 230, 225],
+  texto: [46, 10, 20],
+  textoSuave: [110, 74, 82],
+  dourado: [154, 118, 72],
 };
 const COR_AREA = {
-  A: [201, 216, 232],
-  B: [235, 194, 201],
-  C: [238, 217, 166],
-  D: [205, 191, 227],
-  E: [188, 214, 196],
+  A: [230, 213, 186],
+  B: [235, 196, 198],
+  C: [221, 189, 170],
+  D: [215, 189, 202],
+  E: [203, 207, 192],
 };
 
 // As fontes padrão do PDF só cobrem Latin-1: troca o que fica fora disso por equivalentes simples.
@@ -106,7 +106,7 @@ export async function gerarPdf({ dados, nome, link }) {
   doc.text('A-Livia-ndo', L / 2, 22, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
-  doc.setTextColor(240, 195, 205);
+  doc.setTextColor(220, 194, 154);
   doc.text(limpar('Mapa de autoconhecimento da Lívia Sampaio'), L / 2, 32, { align: 'center' });
   y = 60;
 
@@ -179,9 +179,9 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFillColor(...COR.vinho);
     doc.roundedRect(M, topoCaixa, LARG, alt, 5, 5, 'F');
     y += 9;
-    paragrafo(`Sua trilha: ${perfil.trilha.toLowerCase()}`, { tam: 9.5, cor: [232, 196, 138], estilo: 'bold', alinhar: 'center', esp: 2 });
+    paragrafo(`Sua trilha: ${perfil.trilha.toLowerCase()}`, { tam: 9.5, cor: [220, 194, 154], estilo: 'bold', alinhar: 'center', esp: 2 });
     paragrafo('Continue essa jornada no A-Livia-ndo', { tam: 14, cor: [253, 241, 238], estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 2 });
-    paragrafo(d.convite, { cor: [243, 215, 221], x: M + 8, larg: LARG - 16, esp: 3 });
+    paragrafo(d.convite, { cor: [233, 214, 208], x: M + 8, larg: LARG - 16, esp: 3 });
     const bw = 104;
     const bx = (L - bw) / 2;
     doc.setFillColor(253, 241, 238);

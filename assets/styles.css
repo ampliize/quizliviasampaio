@@ -1,22 +1,24 @@
-/* A-Livia-ndo — cada área do quiz tem uma cor de campo; a tela muda de cor quando a parte muda,
+/* A-Livia-ndo — bordô e dourado; cada área do quiz tem uma cor de campo; a tela muda de cor quando a parte muda,
    e o mapa do resultado usa as mesmas cores. Fora isso, tudo fica quieto. */
 :root{
-  --berinjela:#3A1640;
-  --berinjela-2:#4E2356;
-  --tinta:#2B1433;
-  --tinta-suave:#5E4664;
-  --papel:#FBF8F4;
+  --bordo:#4A0F1F;
+  --bordo-2:#5E1A2C;
+  --ouro:#B8915F;
+  --ouro-claro:#DCC29A;
+  --tinta:#2E0A14;
+  --tinta-suave:#6E4A52;
+  --papel:#F6F1EC;
 
-  --A:#C9D8E8;  /* escolha consciente — névoa */
-  --B:#EBC2C9;  /* amor-próprio — rosa antigo */
-  --C:#EED9A6;  /* segurança emocional — mel */
-  --D:#CDBFE3;  /* limites e comunicação — lavanda */
-  --E:#BCD6C4;  /* qualidade da relação — sálvia */
-  --neutro:#EDE6EE;
+  --A:#E6D5BA;  /* escolha consciente — champanhe */
+  --B:#EBC4C6;  /* amor-próprio — rosa */
+  --C:#DDBDAA;  /* segurança emocional — nude */
+  --D:#D7BDCA;  /* limites e comunicação — malva */
+  --E:#CBCFC0;  /* qualidade da relação — sálvia */
+  --neutro:#EFE6E1;
 
   --campo:var(--neutro);
-  --display:'Young Serif', Georgia, serif;
-  --texto:'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --display:'Gilda Display', Georgia, serif;
+  --texto:'Jost', 'Segoe UI', system-ui, sans-serif;
 }
 
 *{ box-sizing:border-box; }
@@ -32,7 +34,7 @@ body[data-campo="B"]{ --campo:var(--B); }
 body[data-campo="C"]{ --campo:var(--C); }
 body[data-campo="D"]{ --campo:var(--D); }
 body[data-campo="E"]{ --campo:var(--E); }
-body[data-campo="escuro"]{ --campo:var(--berinjela); color:var(--papel); }
+body[data-campo="escuro"]{ --campo:var(--bordo); color:var(--papel); }
 body[data-campo="papel"]{ --campo:var(--papel); }
 
 h1,h2,h3{ font-family:var(--display); font-weight:400; margin:0; line-height:1.15; text-wrap:balance; letter-spacing:-.01em; }
@@ -53,11 +55,11 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 }
 .voltar{
   width:40px; height:40px; border-radius:50%; border:0; cursor:pointer;
-  background:rgba(43,20,51,.08); font-size:20px; line-height:1;
+  background:rgba(46,10,20,.08); font-size:20px; line-height:1;
 }
 .voltar:disabled{ opacity:.3; cursor:default; }
 .trilha{ display:flex; gap:4px; height:6px; }
-.trilha span{ flex:var(--peso,1); border-radius:3px; background:rgba(43,20,51,.12); position:relative; overflow:hidden; }
+.trilha span{ flex:var(--peso,1); border-radius:3px; background:rgba(46,10,20,.12); position:relative; overflow:hidden; }
 .trilha span i{ position:absolute; inset:0; width:var(--feito,0%); background:var(--tinta); border-radius:3px; transition:width .35s ease; }
 .contador{ font-size:14px; color:var(--tinta-suave); font-variant-numeric:tabular-nums; min-width:52px; text-align:right; }
 
@@ -69,12 +71,12 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 .btn{
   display:flex; align-items:center; justify-content:center; width:100%;
   padding:18px 24px; border-radius:999px; border:0; cursor:pointer; text-decoration:none;
-  font-family:var(--texto); font-weight:600; font-size:17px;
-  background:var(--berinjela); color:var(--papel);
+  font-family:var(--texto); font-weight:500; font-size:17px; letter-spacing:.02em;
+  background:var(--bordo); color:var(--papel);
 }
 .btn:active{ transform:scale(.985); }
 .btn[disabled]{ opacity:.55; cursor:default; }
-.btn-claro{ background:var(--papel); color:var(--berinjela); }
+.btn-claro{ background:var(--papel); color:var(--bordo); }
 .btn-contorno{ background:transparent; color:var(--tinta); box-shadow:inset 0 0 0 2px var(--tinta); }
 .acoes{ display:grid; gap:12px; margin-top:32px; }
 .miudo{ font-size:14px; line-height:1.5; color:var(--tinta-suave); }
@@ -82,16 +84,16 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 /* ---------- capa ---------- */
 .capa{ padding-top:max(36px, 6vh); color:var(--papel); }
 .capa .borboleta{ width:132px; height:auto; display:block; margin-left:-6px; }
-.capa .nome-marca{ font-family:var(--display); font-size:19px; margin-top:22px; color:#E9D7EC; }
-.capa h1{ font-size:clamp(34px, 9.6vw, 46px); margin-top:14px; color:var(--papel); }
-.capa .sub{ margin-top:18px; font-size:18px; color:#E2CFE6; max-width:32ch; }
-.capa .como{ margin:30px 0 0; padding:0; list-style:none; display:grid; gap:8px; font-size:16px; color:#F1E6F2; }
+.capa .nome-marca{ font-family:var(--display); font-size:19px; letter-spacing:.06em; margin-top:22px; color:var(--ouro-claro); }
+.capa h1{ font-size:clamp(34px, 9.4vw, 46px); margin-top:14px; color:var(--papel); }
+.capa .sub{ margin-top:18px; font-size:18px; color:#E9D6D0; max-width:32ch; }
+.capa .como{ margin:30px 0 0; padding:0; list-style:none; display:grid; gap:8px; font-size:16px; color:#F4E8E3; }
 .capa .como li{ display:grid; grid-template-columns:22px 1fr; }
 .capa .como li::before{ content:''; width:10px; height:10px; border-radius:50%; margin-top:7px; background:var(--cor); }
-.capa .miudo{ color:#C8B2CD; margin-top:26px; }
-.capa .assina{ margin-top:30px; display:flex; align-items:center; gap:12px; font-size:15px; color:#E2CFE6; }
-.capa .assina strong{ display:block; color:var(--papel); font-weight:600; }
-.capa .foto{ width:44px; height:44px; border-radius:50%; background:var(--B); display:grid; place-items:center; font-family:var(--display); color:var(--berinjela); font-size:20px; }
+.capa .miudo{ color:#C9A3A3; margin-top:26px; }
+.capa .assina{ margin-top:30px; display:flex; align-items:center; gap:12px; font-size:15px; color:#E9D6D0; }
+.capa .assina strong{ display:block; color:var(--papel); font-weight:500; }
+.capa .foto{ width:44px; height:44px; border-radius:50%; background:transparent; box-shadow:inset 0 0 0 1px var(--ouro); display:grid; place-items:center; font-family:var(--display); color:var(--ouro-claro); font-size:20px; }
 
 /* ---------- pergunta ---------- */
 .pergunta{ padding-top:20px; }
@@ -115,7 +117,7 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 /* ---------- abertura de parte ---------- */
 .abertura{ padding-top:max(48px, 9vh); }
 .abertura .parte{ font-size:15px; color:var(--tinta-suave); }
-.abertura h2{ font-size:clamp(36px, 10vw, 48px); margin-top:8px; }
+.abertura h2{ font-size:clamp(35px, 9.8vw, 47px); margin-top:8px; }
 .abertura p.intro{ margin-top:18px; font-size:19px; max-width:30ch; }
 .abertura p.instrucao{ margin-top:14px; font-size:16px; color:var(--tinta-suave); max-width:36ch; }
 
@@ -128,24 +130,24 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 }
 .campo-form input:focus{ outline:none; border-color:var(--tinta); background:#fff; }
 .check{ display:grid; grid-template-columns:22px 1fr; gap:10px; margin-top:20px; font-size:15px; color:var(--tinta-suave); }
-.check input{ width:20px; height:20px; margin:1px 0 0; accent-color:var(--berinjela); }
+.check input{ width:20px; height:20px; margin:1px 0 0; accent-color:var(--bordo); }
 
 /* ---------- carregando ---------- */
 .carregando{ padding-top:22vh; color:var(--papel); }
 .carregando .borboleta{ width:96px; animation:respirar 2.4s ease-in-out infinite; transform-origin:center; }
 @keyframes respirar{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
 .carregando h2{ font-size:28px; margin-top:24px; }
-.carregando p{ margin-top:12px; color:#E2CFE6; min-height:3em; }
+.carregando p{ margin-top:12px; color:#E9D6D0; min-height:3em; }
 
 /* ---------- resultado ---------- */
 .resultado-topo{
-  background:var(--berinjela); color:var(--papel);
+  background:var(--bordo); color:var(--papel);
   margin:-12px -20px 0; padding:36px 20px 40px; padding-top:max(36px, env(safe-area-inset-top));
 }
-.resultado-topo .saudacao{ font-size:17px; color:#E2CFE6; }
-.resultado-topo h1{ font-size:clamp(34px, 9.4vw, 46px); margin-top:14px; }
-.resultado-topo .frase{ margin-top:16px; font-size:19px; color:#F1E6F2; max-width:32ch; }
-.resultado-topo .comp{ margin-top:18px; font-size:15px; color:#C8B2CD; }
+.resultado-topo .saudacao{ font-size:17px; color:#E9D6D0; }
+.resultado-topo h1{ font-size:clamp(33px, 9.2vw, 45px); margin-top:14px; }
+.resultado-topo .frase{ margin-top:16px; font-family:var(--display); font-size:20px; color:var(--ouro-claro); max-width:32ch; }
+.resultado-topo .comp{ margin-top:18px; font-size:15px; color:#C9A3A3; }
 
 .bloco{ margin-top:40px; }
 .bloco h3{ font-size:24px; margin-bottom:12px; }
@@ -156,8 +158,8 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 .mapa .linha{ display:grid; gap:6px; }
 .mapa .rot{ display:flex; justify-content:space-between; gap:12px; font-size:15.5px; }
 .mapa .rot em{ font-style:normal; color:var(--tinta-suave); font-variant-numeric:tabular-nums; }
-.mapa .linha.foco .rot span{ font-weight:600; }
-.mapa .barra{ height:14px; border-radius:7px; background:rgba(43,20,51,.07); overflow:hidden; }
+.mapa .linha.foco .rot span{ font-weight:500; }
+.mapa .barra{ height:14px; border-radius:7px; background:rgba(46,10,20,.07); overflow:hidden; }
 .mapa .barra i{ display:block; height:100%; border-radius:7px; background:var(--cor); }
 .mapa .linha.foco .barra i{ box-shadow:inset 0 0 0 2px var(--tinta); }
 
@@ -167,12 +169,12 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 .exercicio h3{ font-size:24px; margin:6px 0 14px; }
 .exercicio ol{ margin:0; padding-left:22px; display:grid; gap:10px; }
 
-.convite{ background:var(--berinjela); color:var(--papel); border-radius:28px; padding:30px 22px; margin-top:44px; }
+.convite{ background:var(--bordo); color:var(--papel); border-radius:28px; padding:30px 22px; margin-top:44px; }
 .convite h3{ font-size:28px; }
-.convite p{ margin-top:14px; color:#E2CFE6; }
+.convite p{ margin-top:14px; color:#E9D6D0; }
 .convite .btn{ margin-top:24px; }
 
-.cuidado{ margin-top:28px; border-radius:24px; padding:24px 22px; background:#fff; box-shadow:inset 0 0 0 2px var(--berinjela); }
+.cuidado{ margin-top:28px; border-radius:24px; padding:24px 22px; background:#fff; box-shadow:inset 0 0 0 2px var(--bordo); }
 .cuidado h3{ font-size:23px; margin-bottom:10px; }
 .cuidado p + p{ margin-top:10px; }
 .cuidado .btn{ margin-top:18px; }
