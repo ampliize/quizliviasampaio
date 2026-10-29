@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Análise gratuita de perfil · A-Livia-ndo</title>
+  <meta name="description" content="Descubra qual área da sua vida merece mais atenção neste momento. Um mapa de autoconhecimento da Lívia Sampaio.">
+  <meta name="theme-color" content="#fbf3ef">
+  <meta property="og:title" content="Análise gratuita de perfil · A-Livia-ndo">
+  <meta property="og:description" content="Em 5 minutos, descubra o padrão que mais interfere na forma como você se escolhe.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&family=Parisienne&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="butterfly" viewBox="0 0 100 70">
+      <path fill="currentColor" d="M49 30 C46 16 34 6 20 5 C8 4 2 12 4 21 C6 31 20 37 33 35 C40 34 46 32 49 30 Z"/>
+      <path fill="currentColor" d="M51 30 C54 16 66 6 80 5 C92 4 98 12 96 21 C94 31 80 37 67 35 C60 34 54 32 51 30 Z"/>
+      <path fill="currentColor" d="M49 33 C44 34 34 40 30 48 C26 55 30 60 38 57 C45 54 49 42 49 33 Z"/>
+      <path fill="currentColor" d="M51 33 C56 34 66 40 70 48 C74 55 70 60 62 57 C55 54 51 42 51 33 Z"/>
+      <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M50 16 C47.5 21 47.5 45 49.5 58"/>
+    </symbol>
+  </svg>
+
+  <header class="topo" id="topo" hidden>
+    <button class="voltar" id="voltar" type="button" aria-label="Voltar para a pergunta anterior">←</button>
+    <div class="progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progresso">
+      <span id="progresso-barra"></span>
+    </div>
+    <span class="contador" id="contador"></span>
+  </header>
+
+  <main id="app" class="app" aria-live="polite">
+    <noscript><p class="tela">Ative o JavaScript para fazer o quiz.</p></noscript>
+  </main>
+</body>
+</html>
