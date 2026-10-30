@@ -107,6 +107,15 @@ li.vazio{ display:block; color:var(--tinta-suave); }
 .perfil{ display:inline-block !important; width:fit-content; padding:3px 10px; border-radius:999px; background:var(--cor); font-size:14px; }
 .mudo{ color:var(--tinta-suave); }
 
+/* quem é o público */
+.publico{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px 32px; margin-top:16px; }
+.pub h3{ font-family:var(--display); font-weight:400; font-size:19px; margin:0 0 10px; }
+.pub ul{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.pub-rot{ display:flex; justify-content:space-between; gap:10px; font-size:14px; }
+.pub-rot em{ font-style:normal; color:var(--tinta-suave); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.pub .f-barra{ height:8px; margin-top:4px; }
+.pub .f-barra i{ background:var(--ouro); }
+
 /* celular: cada lead vira um bloco empilhado */
 @media (max-width:720px){
   .leads thead{ display:none; }

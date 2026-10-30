@@ -9,12 +9,12 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 
 ## Como funciona
 
-- **Perguntas (versão de captação, até 10):** momento de vida, uma frase por área (A–E) com 3 opções (Nunca / Às vezes / Sempre), o que deseja desenvolver, duas perguntas abertas opcionais intercaladas (qualidade de que se orgulha, depois de amor-próprio; o que mais pesa hoje, antes do cuidado) e uma pergunta de cuidado. Quem está solteira pula a frase da relação (9 perguntas). As 25 frases do documento-base continuam em `assets/quiz-data.js` (`perguntas`), para uma versão completa futura dentro da comunidade; `curta` indica a frase usada na captação.
-- **Perfil:** a área com maior necessidade (o bloco C é lido de forma invertida); o desejo declarado desempata entre áreas parecidas. Empate exato vira "trilha complementar". O cálculo roda também no servidor, então o resultado não depende do navegador.
-- **Perguntas abertas:** vão só para a IA personalizar a devolutiva e não é gravada no CRM. Palavras de risco (ameaça, agressão etc.) também acionam a tela de cuidado.
+- **Perguntas (versão de captação, 12):** a ordem está em `ROTEIRO` (`assets/quiz-data.js`). Primeiro o perfil da mulher (momento, filhos, como se sente com a vida, prioridade), depois autoestima (uma frase por área A–D, com Nunca / Às vezes / Sempre, e "qual qualidade te dá orgulho" para escrever), e por fim renda, "o que gostaria de mudar" (para escrever) e a área da vida que mais precisa melhorar. As 25 frases do documento-base continuam em `perguntas`, para uma versão completa futura dentro da comunidade.
+- **Perfil:** a área com maior necessidade (o bloco C é lido de forma invertida); a área que ela quer melhorar desempata. Empate exato vira "trilha complementar". O cálculo roda também no servidor.
+- **Perguntas abertas:** vão só para a IA personalizar a devolutiva e não são gravadas no CRM. A pergunta explícita sobre violência saiu a pedido da Lívia; se o texto escrito trouxer sinais de risco (ameaça, agressão etc.), o resultado mostra o Ligue 180 e esconde a oferta.
+- **Próximos 7 dias:** sempre uma lista com os 7 itens escritos (IA e texto pronto).
 - **OpenAI:** `api/resultado.js` envia o perfil e as respostas qualificadoras e recebe a devolutiva em JSON estruturado (acolhimento, o que o padrão sinaliza, forças, exercício de 3 minutos, próximo passo, convite). O prompt impede linguagem de diagnóstico, promessas e urgência.
 - **Plano B:** sem chave, com erro ou com demora acima de 20 s, entra a devolutiva pronta de `assets/fallback.js`. O quiz nunca trava.
-- **Triagem de cuidado:** não soma pontos. Se houver sinal de risco, o resultado mostra primeiro o Ligue 180, **esconde a oferta** e marca o lead no CRM como "sinalizou risco" (não enviar oferta). As respostas da triagem nunca são gravadas.
 - **PDF:** gerado no navegador (jsPDF, servido localmente e baixado só no clique), com botão clicável para a comunidade.
 - **Rastreio:** as UTMs, o `fbclid`, o `mc_id` e o `nome` da URL são guardados e repassados ao CTA da comunidade (`utm_content=perfil_X`) e ao mini CRM. Os eventos `quiz_inicio`, `quiz_concluido`, `quiz_pdf_baixado` e `quiz_clique_comunidade` vão para o `dataLayer` e o `fbq` (se o Pixel estiver instalado).
 
@@ -34,6 +34,7 @@ Cada pessoa que abre o link vira uma sessão. O quiz avisa o servidor a cada eta
 - totais do período (abriram, viram o resultado, deixaram contato, baixaram o PDF, clicaram na comunidade);
 - funil com quantas pessoas se perderam entre uma etapa e outra;
 - ranking de onde mais param e perfis de quem concluiu;
+- **quem é o público**: distribuição de filhos, como se sente com a vida, prioridade, renda e área que mais precisa melhorar;
 - lista de leads com situação ("Parou em Limites e comunicação, pergunta 18 de 29"), contato, perfil e origem, com busca, filtros e exportação para CSV.
 
 Filtros por período (hoje, 7, 30, 90 dias, tudo) e por origem (`utm_source`).

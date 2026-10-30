@@ -147,6 +147,19 @@ returns jsonb language sql stable as $$
       'baixaram_pdf', (select count(*) from base where baixou_pdf),
       'clicaram_comunidade', (select count(*) from base where clicou_comunidade)
     ),
+    'publico', (
+      -- distribuição das respostas de perfil (filhos, renda, prioridade...) de quem concluiu
+      select coalesce(jsonb_object_agg(k, v), '{}'::jsonb)
+      from (
+        select k, jsonb_object_agg(val, n) v
+        from (
+          select q.key k, q.value #>> '{}' val, count(*) n
+          from base, jsonb_each(coalesce(base.qualificadoras, '{}'::jsonb)) q
+          group by 1, 2
+        ) x
+        group by k
+      ) y
+    ),
     'perfis', (
       select coalesce(jsonb_object_agg(perfil, n), '{}'::jsonb)
       from (select perfil, count(*) n from base where perfil is not null group by perfil) x
@@ -160,7 +173,7 @@ returns jsonb language sql stable as $$
       select coalesce(jsonb_agg(to_jsonb(l) order by l.ultima_atividade desc), '[]'::jsonb)
       from (
         select id, criado_em, ultima_atividade, etapa, pergunta, total_perguntas, nome, email, whatsapp,
-               consentimento, momento, perfil, complementar, cuidado, concluido_em, baixou_pdf,
+               consentimento, momento, qualificadoras, perfil, complementar, cuidado, concluido_em, baixou_pdf,
                clicou_comunidade, utm_source, utm_medium, utm_campaign, utm_content, mc_id, dispositivo
         from base order by ultima_atividade desc limit 1000
       ) l

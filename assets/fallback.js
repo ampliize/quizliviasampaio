@@ -19,7 +19,18 @@ const TEXTOS = {
         'Ao final, anote em uma frase como você se sentiu.',
       ],
     },
-    proximoPasso: 'Durante 7 dias, termine o dia respondendo: “o que eu fiz hoje que foi só por mim?”',
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: escreva três coisas que você admira em si mesma.',
+        'Dia 2: reserve 20 minutos para algo que é só seu.',
+        'Dia 3: diga um elogio a você mesma em voz alta, na frente do espelho.',
+        'Dia 4: retome contato com uma amiga que te faz bem.',
+        'Dia 5: escolha uma roupa ou um cuidado que te faça se sentir bonita.',
+        'Dia 6: anote uma decisão que você tomou pensando em você.',
+        'Dia 7: releia tudo e escreva como você se sentiu nesta semana.',
+      ],
+    },
   },
   D: {
     acolhimento: 'Você chegou até aqui, e isso mostra que a sua voz quer aparecer. Vamos cuidar dela com calma.',
@@ -36,7 +47,18 @@ const TEXTOS = {
         'Leia a frase em voz alta três vezes, até ela soar natural para você.',
       ],
     },
-    proximoPasso: 'Nesta semana, pratique dizer um “não” pequeno e gentil, sem justificar demais.',
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: anote uma situação que te incomodou e você não falou.',
+        'Dia 2: transforme essa situação em uma frase curta e gentil.',
+        'Dia 3: pratique um "não" pequeno, sem se justificar demais.',
+        'Dia 4: peça ajuda para uma tarefa que você sempre faz sozinha.',
+        'Dia 5: observe como você se sentiu depois de se posicionar.',
+        'Dia 6: escolha um limite que você quer manter daqui para frente.',
+        'Dia 7: escreva o que mudou quando você usou a sua voz.',
+      ],
+    },
   },
   C: {
     acolhimento:
@@ -54,7 +76,18 @@ const TEXTOS = {
         'Releia as colunas e pergunte: quais atitudes reais sustentam essa expectativa?',
       ],
     },
-    proximoPasso: 'Antes de responder uma mensagem que te deixa ansiosa, espere 10 minutos e respire fundo três vezes.',
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: antes de responder uma mensagem que te deixa ansiosa, espere 10 minutos.',
+        'Dia 2: escreva o que você sente quando alguém demora a responder.',
+        'Dia 3: faça algo que te dá prazer sem depender de ninguém.',
+        'Dia 4: liste três atitudes que mostram, de verdade, que alguém se importa com você.',
+        'Dia 5: passe uma hora longe do celular, só com você.',
+        'Dia 6: escreva uma carta curta para a mulher que você quer ser.',
+        'Dia 7: releia a carta e escolha uma atitude para manter.',
+      ],
+    },
   },
   A: {
     acolhimento: 'Você está sendo convidada a olhar para a vida com mais clareza — e isso é sinal de maturidade.',
@@ -71,7 +104,18 @@ const TEXTOS = {
         'Guarde essa lista e consulte antes de tomar decisões afetivas importantes.',
       ],
     },
-    proximoPasso: 'Na próxima vez que se encantar por alguém, observe como essa pessoa trata quem não pode oferecer nada a ela.',
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: liste cinco valores que você não abre mão.',
+        'Dia 2: escreva como você se sente quando está perto das pessoas que ama.',
+        'Dia 3: observe se suas escolhas desta semana combinam com seus valores.',
+        'Dia 4: pense em quem você se torna ao lado de cada pessoa próxima.',
+        'Dia 5: anote um sinal que você costuma ignorar e decida observá-lo.',
+        'Dia 6: converse com alguém de confiança sobre o que você quer para o seu futuro.',
+        'Dia 7: escreva uma frase que resuma o tipo de vida que você está escolhendo.',
+      ],
+    },
   },
   E: {
     acolhimento: 'Olhar com honestidade para a própria relação exige coragem. Você está fazendo isso agora.',
@@ -88,7 +132,18 @@ const TEXTOS = {
         'No fim da semana, observe o padrão — atitudes falam mais do que promessas.',
       ],
     },
-    proximoPasso: 'Escolha um tema que precisa ser conversado e escreva, antes, o que você sente e o que você precisa.',
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: anote um momento em que você se sentiu segura na relação.',
+        'Dia 2: anote um momento em que você sentiu dúvida.',
+        'Dia 3: escreva o que você precisa e ainda não pediu.',
+        'Dia 4: escolha um tema para conversar com calma.',
+        'Dia 5: tenha essa conversa usando "eu sinto" e "eu preciso".',
+        'Dia 6: observe as atitudes depois da conversa, não só as promessas.',
+        'Dia 7: escreva o que você aprendeu sobre você nesta semana.',
+      ],
+    },
   },
 };
 

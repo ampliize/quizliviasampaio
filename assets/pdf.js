@@ -1,5 +1,5 @@
 // Gera o "Mapa de autoconhecimento" em PDF no próprio navegador (jsPDF via CDN).
-import { PERFIS } from './quiz-data.js';
+import { PERFIS, proximoPassoEmLista } from './quiz-data.js';
 import { CONFIG } from './config.js';
 
 // Mesma paleta da página: bordô e dourado + uma cor por área do mapa.
@@ -165,8 +165,9 @@ export async function gerarPdf({ dados, nome, link }) {
   titulo(`Para fazer agora, em 3 minutos: ${d.exercicio.titulo}`);
   d.exercicio.passos.forEach((p, i) => paragrafo(`${i + 1}.  ${p}`, { esp: 2 }));
 
-  titulo('Nos próximos 7 dias');
-  paragrafo(d.proximoPasso);
+  const proximo = proximoPassoEmLista(d.proximoPasso);
+  titulo(proximo.titulo);
+  proximo.passos.forEach((p) => paragrafo(p, { esp: 2 }));
 
   // ---------- convite ----------
   if (!dados.cuidado) {

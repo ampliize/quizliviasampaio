@@ -5,15 +5,20 @@ const ATIVA_MINUTOS = 30;
 
 const NOMES_ETAPA = {
   capa: 'Abriu e não começou',
-  momento: 'Momento de vida',
+  momento: 'Perfil (momento, filhos, vida, prioridade)',
   ...Object.fromEntries(BLOCOS.map((b) => [b.id, b.nome])),
-  qualificadoras: 'Perguntas finais',
+  qualificadoras: 'Renda, mudança e área a melhorar',
   cuidado: 'Triagem de cuidado',
   contato: 'Tela de contato',
   resultado: 'Viu o resultado',
 };
-// solteiras pulam o bloco E, então quem passou dele também conta como "chegou"
-const NOMES_FUNIL = { ...NOMES_ETAPA, capa: 'Abriram o link', E: 'Qualidade da relação (solteiras pulam)', resultado: 'Viram o resultado' };
+const NOMES_FUNIL = { ...NOMES_ETAPA, capa: 'Abriram o link', resultado: 'Viram o resultado' };
+// etapas que existem no banco mas não estão no quiz de captação (relação e triagem saíram a pedido da Lívia)
+const FORA_DO_QUIZ = ['E', 'cuidado'];
+// o que o painel mostra em "Quem é o público"
+const PUBLICO = ['filhos', 'sentimento', 'prioridade', 'renda', 'area'];
+const TITULO_PUBLICO = { filhos: 'Filhos', sentimento: 'Como se sente com a vida', prioridade: 'Maior prioridade', renda: 'Renda mensal', area: 'Área que mais precisa melhorar' };
+const resposta = (chave, v) => QUALIFICADORAS[chave]?.opcoes[v]?.replace(/\.$/, '') || '';
 const COR_ETAPA = { A: 'var(--A)', B: 'var(--B)', C: 'var(--C)', D: 'var(--D)', E: 'var(--E)' };
 
 const $ = (id) => document.getElementById(id);
@@ -136,9 +141,10 @@ function desenhar() {
   );
 
   // funil
+  const funil = dados.funil.filter((f) => !FORA_DO_QUIZ.includes(f.etapa));
   $('funil').replaceChildren(
-    ...dados.funil.map((f, i) => {
-      const antes = i ? dados.funil[i - 1].alcancaram : f.alcancaram;
+    ...funil.map((f, i) => {
+      const antes = i ? funil[i - 1].alcancaram : f.alcancaram;
       const perdeu = antes - f.alcancaram;
       return h(
         'li',
@@ -166,6 +172,34 @@ function desenhar() {
     ...(perfis.length
       ? perfis.map(([id, n]) => h('li', { style: `--cor:var(--${id})` }, h('span', {}, PERFIS[id]?.nome || id), h('strong', {}, num(n))))
       : [h('li', { class: 'vazio' }, 'Ainda não há resultados neste período.')]),
+  );
+
+  // quem é o público: distribuição de cada resposta de perfil
+  const publico = dados.publico || {};
+  $('publico').replaceChildren(
+    ...PUBLICO.map((chave) => {
+      const contagem = Object.entries(publico[chave] || {}).sort((a, b) => b[1] - a[1]);
+      const total = contagem.reduce((s, [, n]) => s + n, 0);
+      return h(
+        'div',
+        { class: 'pub' },
+        h('h3', {}, TITULO_PUBLICO[chave]),
+        contagem.length
+          ? h(
+              'ul',
+              {},
+              contagem.map(([v, n]) =>
+                h(
+                  'li',
+                  {},
+                  h('div', { class: 'pub-rot' }, h('span', {}, resposta(chave, v) || v), h('em', {}, `${num(n)} (${pct(n, total)})`)),
+                  h('div', { class: 'f-barra' }, h('i', { style: `width:${(n / total) * 100}%` })),
+                ),
+              ),
+            )
+          : h('p', { class: 'legenda' }, 'Ainda sem respostas.'),
+      );
+    }),
   );
 
   // origens no select (mantém a escolhida)
@@ -221,6 +255,9 @@ function desenharLeads() {
               'td',
               { 'data-rotulo': 'Perfil' },
               l.perfil ? h('span', { class: 'perfil', style: `--cor:var(--${l.perfil})` }, PERFIS[l.perfil]?.nome || l.perfil) : h('span', { class: 'mudo' }, 'Sem resultado'),
+              l.qualificadoras?.area && h('small', {}, `Quer melhorar: ${resposta('area', l.qualificadoras.area)}`),
+              l.qualificadoras?.filhos && h('small', {}, `Filhos: ${resposta('filhos', l.qualificadoras.filhos)}`),
+              l.qualificadoras?.renda && h('small', {}, `Renda: ${resposta('renda', l.qualificadoras.renda)}`),
             ),
             h(
               'td',
@@ -240,7 +277,9 @@ function exportarCsv() {
   if (!dados) return;
   const colunas = [
     ['nome', 'Nome'], ['email', 'E-mail'], ['whatsapp', 'WhatsApp'], ['consentimento', 'Autorizou conteúdos'],
-    ['situacao', 'Situação'], ['perfil_nome', 'Perfil'], ['momento', 'Momento'], ['cuidado', 'Sinalizou risco'],
+    ['situacao', 'Situação'], ['perfil_nome', 'Perfil'], ['momento', 'Momento'],
+    ...PUBLICO.map((c) => [c, TITULO_PUBLICO[c]]),
+    ['cuidado', 'Sinalizou risco'],
     ['utm_source', 'utm_source'], ['utm_medium', 'utm_medium'], ['utm_campaign', 'utm_campaign'], ['utm_content', 'utm_content'],
     ['mc_id', 'ManyChat ID'], ['criado_em', 'Entrou em'], ['ultima_atividade', 'Última atividade'],
   ];
@@ -249,6 +288,7 @@ function exportarCsv() {
     situacao: situacao(l).texto,
     perfil_nome: PERFIS[l.perfil]?.nome || '',
     momento: QUALIFICADORAS.momento.opcoes[l.momento] || '',
+    ...Object.fromEntries(PUBLICO.map((c) => [c, resposta(c, l.qualificadoras?.[c])])),
     consentimento: l.consentimento ? 'sim' : 'não',
     cuidado: l.cuidado ? 'sim' : 'não',
     criado_em: new Date(l.criado_em).toLocaleString('pt-BR'),

@@ -4,11 +4,11 @@ import {
   QUALIFICADORAS,
   PERGUNTAS_ABERTAS,
   MAX_TEXTO_ABERTO,
-  TRIAGEM,
   PERFIS,
-  blocosAplicaveis,
+  ROTEIRO,
   calcularResultado,
   precisaCuidado,
+  proximoPassoEmLista,
 } from './quiz-data.js';
 import { devolutivaPadrao } from './fallback.js';
 import { CONFIG } from './config.js';
@@ -20,7 +20,7 @@ const btnVoltar = document.getElementById('voltar');
 const trilha = document.getElementById('progresso');
 const contador = document.getElementById('contador');
 
-const CHAVE_SALVO = 'aliviando_quiz_v3';
+const CHAVE_SALVO = 'aliviando_quiz_v4';
 const PARAMS_RASTREIO = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'mc_id', 'origem'];
 
 // ---------- estado ----------
@@ -29,7 +29,6 @@ const estado = carregar() || {
   respostas: Object.fromEntries(BLOCOS.map((b) => [b.id, [null]])),
   textos: {},
   qualificadoras: {},
-  triagem: {},
   lead: { nome: '', email: '', whatsapp: '', consentimento: false },
   rastreio: {},
 };
@@ -91,10 +90,7 @@ function etapaDaTela(tela) {
   if (tela.tipo === 'capa') return 'capa';
   if (tela.tipo === 'resultado') return 'resultado';
   if (tela.tipo === 'lead') return 'contato';
-  if (tela.tipo === 'triagem') return 'cuidado';
-  if (tela.tipo === 'aberta') return tela.etapa;
-  if (tela.tipo === 'qualificadora') return tela.chave === 'momento' ? 'momento' : 'qualificadoras';
-  return tela.bloco.id;
+  return tela.etapa;
 }
 let ultimoPassoRegistrado = null;
 
@@ -106,29 +102,24 @@ function rastrear(evento, dados = {}) {
 
 // ---------- roteiro de telas ----------
 // Cada tela pertence a um "trecho" (a parte do quiz). O trecho decide a cor de fundo
-// e o segmento da barra de progresso. O roteiro depende do momento de vida (bloco E some para solteiras).
-// Versão de captação: no máximo 9 perguntas (uma frase por área), pedido da Lívia.
+// e o segmento da barra de progresso. A ordem das perguntas vem de ROTEIRO (quiz-data.js).
 function roteiro() {
   const telas = [{ tipo: 'capa', trecho: null, campo: 'escuro' }];
-  telas.push({ tipo: 'qualificadora', chave: 'momento', trecho: 'inicio', campo: 'neutro' });
-  // pergunta aberta logo depois da tela indicada em `depoisDe`, herdando a cor e a etapa dela
-  const abertaDepois = (ref, trecho, campo, etapa) =>
-    Object.entries(PERGUNTAS_ABERTAS)
-      .filter(([, q]) => q.depoisDe === ref)
-      .forEach(([chave]) => telas.push({ tipo: 'aberta', chave, trecho, campo, etapa }));
-  blocosAplicaveis(estado.qualificadoras.momento).forEach((bloco) => {
-    telas.push({ tipo: 'escala', bloco, texto: bloco.perguntas[bloco.curta], trecho: bloco.id, campo: bloco.id });
-    abertaDepois(bloco.id, bloco.id, bloco.id, bloco.id);
+  const trechoDa = (etapa) => (etapa === 'momento' ? 'inicio' : etapa === 'qualificadoras' ? 'fim' : etapa);
+  ROTEIRO.forEach((item) => {
+    const trecho = trechoDa(item.etapa);
+    const campo = BLOCOS.some((b) => b.id === trecho) ? trecho : 'neutro';
+    if (item.tipo === 'escala') {
+      const bloco = BLOCOS.find((b) => b.id === item.bloco);
+      telas.push({ tipo: 'escala', bloco, texto: bloco.perguntas[bloco.curta], trecho, campo, etapa: item.etapa });
+    } else telas.push({ ...item, trecho, campo });
   });
-  telas.push({ tipo: 'qualificadora', chave: 'desejo', trecho: 'fim', campo: 'neutro' });
-  abertaDepois('desejo', 'fim', 'neutro', 'qualificadoras');
-  Object.keys(TRIAGEM).forEach((chave) => telas.push({ tipo: 'triagem', chave, trecho: 'fim', campo: 'papel' }));
   telas.push({ tipo: 'lead', trecho: 'fim', campo: 'neutro' });
   telas.push({ tipo: 'resultado', trecho: null, campo: 'escuro' });
   return telas;
 }
 
-const ehPergunta = (t) => ['escala', 'qualificadora', 'aberta', 'triagem'].includes(t.tipo);
+const ehPergunta = (t) => ['escala', 'qualificadora', 'aberta'].includes(t.tipo);
 
 function ir(passo) {
   estado.passo = Math.max(0, passo);
@@ -180,7 +171,7 @@ function render() {
       registrarCrm('etapa', { etapa: etapaDaTela(tela), ...(n >= 0 ? { pergunta: n + 1, total: perguntas.length } : {}) });
   }
   atualizarTopo(telas, tela);
-  const renderizadores = { capa, qualificadora, escala, aberta, triagem, lead, resultado };
+  const renderizadores = { capa, qualificadora, escala, aberta, lead, resultado };
   app.innerHTML = '';
   const el = renderizadores[tela.tipo](tela);
   el.classList.add('tela');
@@ -273,7 +264,7 @@ function capa() {
     h(
       'ul',
       { class: 'como' },
-      h('li', { style: '--cor:var(--A)' }, 'São só 10 perguntas, cerca de 3 minutos'),
+      h('li', { style: '--cor:var(--A)' }, 'São 12 perguntas rápidas, cerca de 3 minutos'),
       h('li', { style: '--cor:var(--B)' }, 'Seu resultado aparece na hora'),
       h('li', { style: '--cor:var(--C)' }, 'Você leva o mapa completo em PDF, com um exercício'),
     ),
@@ -289,13 +280,12 @@ function capa() {
 
 function qualificadora({ chave }) {
   const q = QUALIFICADORAS[chave];
-  const dica = chave === 'momento' ? 'Assim as próximas perguntas e o seu resultado ficam mais certeiros.' : null;
   return h(
     'section',
     { class: 'pergunta' },
-    h('p', { class: 'area' }, chave === 'momento' ? 'Antes de começar' : 'Sobre o seu momento'),
+    h('p', { class: 'area' }, q.rotulo),
     h('h2', {}, q.pergunta),
-    dica && h('p', { class: 'dica' }, dica),
+    q.dica && h('p', { class: 'dica' }, q.dica),
     listaOpcoes(deObjeto(q.opcoes), estado.qualificadoras[chave], (valor) => {
       estado.qualificadoras[chave] = valor;
       ir(estado.passo + 1);
@@ -304,16 +294,8 @@ function qualificadora({ chave }) {
 }
 
 function escala({ bloco, texto }) {
-  const primeira = blocosAplicaveis(estado.qualificadoras.momento)[0] === bloco;
-  const dicas = {
-    recuperando: 'Se a relação já terminou, pense em como ela era nos últimos meses.',
-    conhecendo: 'Pense na pessoa que você está conhecendo.',
-  };
-  const dica = primeira
-    ? 'Marque o que mais se parece com a sua vida hoje. Não existe resposta certa, só a honesta.'
-    : bloco.id === 'E'
-      ? dicas[estado.qualificadoras.momento]
-      : null;
+  const primeira = ROTEIRO.find((t) => t.tipo === 'escala').bloco === bloco.id;
+  const dica = primeira ? 'Marque o que mais se parece com a sua vida hoje. Não existe resposta certa, só a honesta.' : null;
   const pontos = (n) => h('span', { class: 'freq', 'aria-hidden': 'true' }, [0, 1].map((k) => h('b', { class: k < n ? 'on' : '' })));
   return h(
     'section',
@@ -359,21 +341,6 @@ function aberta({ chave }) {
       h('button', { class: 'btn', type: 'button', onclick: seguir }, 'Continuar'),
       h('button', { class: 'btn btn-contorno', type: 'button', onclick: () => { campo.value = ''; seguir(); } }, 'Prefiro não escrever'),
     ),
-  );
-}
-
-function triagem({ chave }) {
-  const q = TRIAGEM[chave];
-  return h(
-    'section',
-    { class: 'pergunta' },
-    h('p', { class: 'area' }, 'Cuidado com você'),
-    h('h2', {}, q.pergunta),
-    q.dica && h('p', { class: 'dica' }, q.dica),
-    listaOpcoes(deObjeto(q.opcoes), estado.triagem[chave], (valor) => {
-      estado.triagem[chave] = valor;
-      ir(estado.passo + 1);
-    }),
   );
 }
 
@@ -457,7 +424,6 @@ async function buscarResultado() {
   const corpo = {
     respostas: estado.respostas,
     qualificadoras: estado.qualificadoras,
-    triagem: estado.triagem,
     textos: estado.textos,
     lead: estado.lead,
     rastreio: estado.rastreio,
@@ -474,8 +440,8 @@ async function buscarResultado() {
     dados = await resp.json();
   } catch {
     // Sem servidor (ou fora do ar): calcula aqui mesmo e usa a devolutiva pronta.
-    const calc = calcularResultado(estado.respostas, estado.qualificadoras.momento, estado.qualificadoras.desejo);
-    dados = { ...calc, cuidado: precisaCuidado(estado.triagem, estado.textos), devolutiva: devolutivaPadrao({ ...calc, nome: estado.lead.nome, orgulho: estado.textos.orgulho }) };
+    const calc = calcularResultado(estado.respostas, estado.qualificadoras.area);
+    dados = { ...calc, cuidado: precisaCuidado(estado.textos), devolutiva: devolutivaPadrao({ ...calc, nome: estado.lead.nome, orgulho: estado.textos.orgulho }) };
   }
   estado.resultado = dados;
   salvar();
@@ -548,12 +514,14 @@ function telaResultado(dados) {
       h('a', { class: 'btn', href: 'tel:180' }, `Ligar para o ${CONFIG.contatoCuidado}`),
     );
 
+  const proximo = proximoPassoEmLista(d.proximoPasso);
+
   const convite =
     !dados.cuidado &&
     h(
       'section',
       { class: 'convite' },
-      h('h3', {}, `Sua trilha de ${perfil.trilha.toLowerCase()} continua no A-Livia-ndo`),
+      h('h3', {}, 'Quer fazer parte da comunidade A-Livia-ndo?'),
       h('p', {}, d.convite),
       h(
         'a',
@@ -565,7 +533,7 @@ function telaResultado(dados) {
             registrarCrm('comunidade');
           },
         },
-        'Conhecer o A-Livia-ndo',
+        'Quero fazer parte da comunidade',
       ),
     );
 
@@ -598,7 +566,12 @@ function telaResultado(dados) {
       h('h3', {}, d.exercicio.titulo),
       h('ol', {}, d.exercicio.passos.map((p) => h('li', {}, p))),
     ),
-    h('section', { class: 'bloco' }, h('h3', {}, 'Nos próximos 7 dias'), h('p', {}, d.proximoPasso)),
+    h(
+      'section',
+      { class: 'bloco' },
+      h('h3', {}, proximo.titulo),
+      h('ul', { class: 'passos-semana' }, proximo.passos.map((p) => h('li', {}, p))),
+    ),
     h('div', { class: 'acoes' }, h('button', { class: 'btn btn-contorno', type: 'button', onclick: baixar }, 'Baixar meu mapa em PDF')),
     convite,
     h('p', { class: 'fecho' }, d.fraseFinal),
