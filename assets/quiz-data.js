@@ -118,12 +118,23 @@ export const QUALIFICADORAS = {
   },
 };
 
-// Pergunta aberta (opcional): vai só para a IA personalizar a devolutiva, não é gravada no CRM.
-export const PERGUNTA_ABERTA = {
-  pergunta: 'Em poucas palavras, o que mais pesa no seu coração hoje?',
-  dica: 'É opcional. O que você escrever serve só para personalizar o seu resultado.',
-  max: 400,
+// Perguntas abertas (opcionais): vão só para a IA personalizar a devolutiva, não são gravadas no CRM.
+// `depoisDe` diz onde cada uma entra no roteiro, para intercalar escrever e selecionar.
+export const PERGUNTAS_ABERTAS = {
+  orgulho: {
+    pergunta: 'Qual qualidade sua te dá orgulho?',
+    dica: 'Pode ser uma palavra ou uma frase. É opcional.',
+    exemplo: 'Ex.: sou leal, não desisto fácil, cuido bem de quem amo…',
+    depoisDe: 'B',
+  },
+  peso: {
+    pergunta: 'Em poucas palavras, o que mais pesa no seu coração hoje?',
+    dica: 'É opcional. O que você escrever serve só para personalizar o seu resultado.',
+    exemplo: 'Escreva aqui, do seu jeito…',
+    depoisDe: 'desejo',
+  },
 };
+export const MAX_TEXTO_ABERTO = 400;
 
 // Triagem de cuidado: nunca soma no perfil, só decide se a tela prioriza segurança.
 export const TRIAGEM = {
@@ -208,6 +219,6 @@ export function calcularResultado(respostas, momento, desejo) {
 const SINAIS_DE_RISCO = /agred|agress|me bate|bateu|apanh|ameaç|violên|violenc|abus|estupr|me machuca|medo dele|me mat|suicid|me forç|me obrig/i;
 
 /** true quando a participante sinalizou risco: a tela prioriza cuidado e não oferta. */
-export function precisaCuidado(triagem = {}, textoAberto = '') {
-  return triagem.risco === 'sim' || SINAIS_DE_RISCO.test(textoAberto || '');
+export function precisaCuidado(triagem = {}, textos = {}) {
+  return triagem.risco === 'sim' || Object.values(textos || {}).some((t) => SINAIS_DE_RISCO.test(t || ''));
 }

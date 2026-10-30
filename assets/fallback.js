@@ -92,7 +92,7 @@ const TEXTOS = {
   },
 };
 
-export function devolutivaPadrao({ perfil, complementar, nome }) {
+export function devolutivaPadrao({ perfil, complementar, nome, orgulho }) {
   const base = TEXTOS[perfil];
   const p = PERFIS[perfil];
   const primeiroNome = (nome || '').trim().split(/\s+/)[0];
@@ -107,7 +107,8 @@ export function devolutivaPadrao({ perfil, complementar, nome }) {
     saudacao: primeiroNome ? `${primeiroNome}, este é o seu mapa de hoje.` : 'Este é o seu mapa de hoje.',
     acolhimento: base.acolhimento,
     oQueSinaliza: sinaliza,
-    forcas: base.forcas,
+    // a qualidade que ela mesma escreveu vem primeiro
+    forcas: orgulho ? [orgulho.slice(0, 80), ...base.forcas.slice(0, 2)] : base.forcas,
     exercicio: base.exercicio,
     proximoPasso: base.proximoPasso,
     convite:

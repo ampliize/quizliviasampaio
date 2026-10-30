@@ -2,7 +2,8 @@ import {
   ESCALA,
   BLOCOS,
   QUALIFICADORAS,
-  PERGUNTA_ABERTA,
+  PERGUNTAS_ABERTAS,
+  MAX_TEXTO_ABERTO,
   TRIAGEM,
   PERFIS,
   blocosAplicaveis,
@@ -19,14 +20,14 @@ const btnVoltar = document.getElementById('voltar');
 const trilha = document.getElementById('progresso');
 const contador = document.getElementById('contador');
 
-const CHAVE_SALVO = 'aliviando_quiz_v2';
+const CHAVE_SALVO = 'aliviando_quiz_v3';
 const PARAMS_RASTREIO = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'mc_id', 'origem'];
 
 // ---------- estado ----------
 const estado = carregar() || {
   passo: 0,
   respostas: Object.fromEntries(BLOCOS.map((b) => [b.id, [null]])),
-  textoAberto: '',
+  textos: {},
   qualificadoras: {},
   triagem: {},
   lead: { nome: '', email: '', whatsapp: '', consentimento: false },
@@ -91,7 +92,7 @@ function etapaDaTela(tela) {
   if (tela.tipo === 'resultado') return 'resultado';
   if (tela.tipo === 'lead') return 'contato';
   if (tela.tipo === 'triagem') return 'cuidado';
-  if (tela.tipo === 'aberta') return 'qualificadoras';
+  if (tela.tipo === 'aberta') return tela.etapa;
   if (tela.tipo === 'qualificadora') return tela.chave === 'momento' ? 'momento' : 'qualificadoras';
   return tela.bloco.id;
 }
@@ -110,11 +111,17 @@ function rastrear(evento, dados = {}) {
 function roteiro() {
   const telas = [{ tipo: 'capa', trecho: null, campo: 'escuro' }];
   telas.push({ tipo: 'qualificadora', chave: 'momento', trecho: 'inicio', campo: 'neutro' });
+  // pergunta aberta logo depois da tela indicada em `depoisDe`, herdando a cor e a etapa dela
+  const abertaDepois = (ref, trecho, campo, etapa) =>
+    Object.entries(PERGUNTAS_ABERTAS)
+      .filter(([, q]) => q.depoisDe === ref)
+      .forEach(([chave]) => telas.push({ tipo: 'aberta', chave, trecho, campo, etapa }));
   blocosAplicaveis(estado.qualificadoras.momento).forEach((bloco) => {
     telas.push({ tipo: 'escala', bloco, texto: bloco.perguntas[bloco.curta], trecho: bloco.id, campo: bloco.id });
+    abertaDepois(bloco.id, bloco.id, bloco.id, bloco.id);
   });
   telas.push({ tipo: 'qualificadora', chave: 'desejo', trecho: 'fim', campo: 'neutro' });
-  telas.push({ tipo: 'aberta', trecho: 'fim', campo: 'neutro' });
+  abertaDepois('desejo', 'fim', 'neutro', 'qualificadoras');
   Object.keys(TRIAGEM).forEach((chave) => telas.push({ tipo: 'triagem', chave, trecho: 'fim', campo: 'papel' }));
   telas.push({ tipo: 'lead', trecho: 'fim', campo: 'neutro' });
   telas.push({ tipo: 'resultado', trecho: null, campo: 'escuro' });
@@ -266,7 +273,7 @@ function capa() {
     h(
       'ul',
       { class: 'como' },
-      h('li', { style: '--cor:var(--A)' }, 'São só 9 perguntas, cerca de 2 minutos'),
+      h('li', { style: '--cor:var(--A)' }, 'São só 10 perguntas, cerca de 3 minutos'),
       h('li', { style: '--cor:var(--B)' }, 'Seu resultado aparece na hora'),
       h('li', { style: '--cor:var(--C)' }, 'Você leva o mapa completo em PDF, com um exercício'),
     ),
@@ -325,25 +332,26 @@ function escala({ bloco, texto }) {
   );
 }
 
-function aberta() {
+function aberta({ chave }) {
+  const q = PERGUNTAS_ABERTAS[chave];
   const campo = h('textarea', {
     class: 'campo-aberto',
     rows: '4',
-    maxlength: String(PERGUNTA_ABERTA.max),
-    'aria-label': PERGUNTA_ABERTA.pergunta,
-    placeholder: 'Escreva aqui, do seu jeito…',
+    maxlength: String(MAX_TEXTO_ABERTO),
+    'aria-label': q.pergunta,
+    placeholder: q.exemplo,
   });
-  campo.value = estado.textoAberto || '';
+  campo.value = estado.textos[chave] || '';
   const seguir = () => {
-    estado.textoAberto = campo.value.trim().slice(0, PERGUNTA_ABERTA.max);
+    estado.textos[chave] = campo.value.trim().slice(0, MAX_TEXTO_ABERTO);
     ir(estado.passo + 1);
   };
   return h(
     'section',
     { class: 'pergunta' },
-    h('p', { class: 'area' }, 'Sobre o seu momento'),
-    h('h2', {}, PERGUNTA_ABERTA.pergunta),
-    h('p', { class: 'dica' }, PERGUNTA_ABERTA.dica),
+    h('p', { class: 'area' }, 'Para você escrever'),
+    h('h2', {}, q.pergunta),
+    h('p', { class: 'dica' }, q.dica),
     campo,
     h(
       'div',
@@ -450,7 +458,7 @@ async function buscarResultado() {
     respostas: estado.respostas,
     qualificadoras: estado.qualificadoras,
     triagem: estado.triagem,
-    textoAberto: estado.textoAberto,
+    textos: estado.textos,
     lead: estado.lead,
     rastreio: estado.rastreio,
     sessao: estado.sessao,
@@ -467,7 +475,7 @@ async function buscarResultado() {
   } catch {
     // Sem servidor (ou fora do ar): calcula aqui mesmo e usa a devolutiva pronta.
     const calc = calcularResultado(estado.respostas, estado.qualificadoras.momento, estado.qualificadoras.desejo);
-    dados = { ...calc, cuidado: precisaCuidado(estado.triagem, estado.textoAberto), devolutiva: devolutivaPadrao({ ...calc, nome: estado.lead.nome }) };
+    dados = { ...calc, cuidado: precisaCuidado(estado.triagem, estado.textos), devolutiva: devolutivaPadrao({ ...calc, nome: estado.lead.nome, orgulho: estado.textos.orgulho }) };
   }
   estado.resultado = dados;
   salvar();
