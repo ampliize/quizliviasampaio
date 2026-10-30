@@ -148,7 +148,7 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFontSize(9.5);
     doc.setTextColor(...COR.texto);
     doc.text(limpar(b.nome), M, y + 3);
-    doc.text(`${b.forca}%`, M + LARG, y + 3, { align: 'right' });
+    doc.text(limpar(b.nivel), M + LARG, y + 3, { align: 'right' });
     doc.setFillColor(...COR.fundoAlt);
     doc.roundedRect(M, y + 5, LARG, 3, 1.5, 1.5, 'F');
     doc.setFillColor(...COR_AREA[b.id]);

@@ -9,8 +9,9 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 
 ## Como funciona
 
-- **Perguntas:** 1 de momento de vida, 25 de escala (blocos A–E), 4 qualificadoras e 4 de triagem de cuidado, todas tiradas do documento‑base do quiz. Quem está solteira pula o bloco E (qualidade da relação), que fica com 24 perguntas.
-- **Perfil:** é calculado pela regra do documento (necessidade por bloco, com o bloco C lido de forma invertida). Quando dois blocos ficam a até 10 pontos um do outro, o segundo aparece como "trilha complementar". O cálculo roda também no servidor (`assets/quiz-data.js`), então o resultado não depende do navegador.
+- **Perguntas (versão de captação, até 9):** momento de vida, uma frase por área (A–E) com 3 opções (Nunca / Às vezes / Sempre), o que deseja desenvolver, uma pergunta aberta opcional e uma pergunta de cuidado. Quem está solteira pula a frase da relação (8 perguntas). As 25 frases do documento-base continuam em `assets/quiz-data.js` (`perguntas`), para uma versão completa futura dentro da comunidade; `curta` indica a frase usada na captação.
+- **Perfil:** a área com maior necessidade (o bloco C é lido de forma invertida); o desejo declarado desempata entre áreas parecidas. Empate exato vira "trilha complementar". O cálculo roda também no servidor, então o resultado não depende do navegador.
+- **Pergunta aberta:** vai só para a IA personalizar a devolutiva e não é gravada no CRM. Palavras de risco (ameaça, agressão etc.) também acionam a tela de cuidado.
 - **OpenAI:** `api/resultado.js` envia o perfil e as respostas qualificadoras e recebe a devolutiva em JSON estruturado (acolhimento, o que o padrão sinaliza, forças, exercício de 3 minutos, próximo passo, convite). O prompt impede linguagem de diagnóstico, promessas e urgência.
 - **Plano B:** sem chave, com erro ou com demora acima de 20 s, entra a devolutiva pronta de `assets/fallback.js`. O quiz nunca trava.
 - **Triagem de cuidado:** não soma pontos. Se houver sinal de risco, o resultado mostra primeiro o Ligue 180, **esconde a oferta** e marca o lead no CRM como "sinalizou risco" (não enviar oferta). As respostas da triagem nunca são gravadas.

@@ -2,18 +2,21 @@
 // Compartilhado entre o navegador (assets/app.js) e o servidor (api/resultado.js),
 // para que o perfil seja sempre calculado com a mesma regra dos dois lados.
 
+// Versão de captação: 3 opções, pedido da Lívia (5 níveis confundiam as respostas).
 export const ESCALA = [
   { valor: 0, rotulo: 'Nunca' },
-  { valor: 1, rotulo: 'Raramente' },
-  { valor: 2, rotulo: 'Às vezes' },
-  { valor: 3, rotulo: 'Frequente' },
-  { valor: 4, rotulo: 'Quase sempre' },
+  { valor: 1, rotulo: 'Às vezes' },
+  { valor: 2, rotulo: 'Sempre' },
 ];
+const MAX_ESCALA = 2;
 
 // invertido: pontuação alta indica MAIS necessidade (bloco C — carência).
+// `perguntas` guarda as 25 frases do documento-base (versão completa, para quem já está na comunidade);
+// `curta` é a frase usada no quiz de captação, uma por área.
 export const BLOCOS = [
   {
     id: 'A',
+    curta: 2,
     nome: 'Escolha consciente',
     rotuloForca: 'Escolha consciente',
     intro: 'Vamos começar olhando para a forma como você escolhe.',
@@ -28,6 +31,7 @@ export const BLOCOS = [
   },
   {
     id: 'B',
+    curta: 1,
     nome: 'Amor-próprio e identidade',
     rotuloForca: 'Amor-próprio e identidade',
     intro: 'Agora, sobre o espaço que você ocupa na sua própria vida.',
@@ -42,6 +46,7 @@ export const BLOCOS = [
   },
   {
     id: 'C',
+    curta: 1,
     nome: 'Carência e validação',
     rotuloForca: 'Segurança emocional',
     intro: 'Algumas frases agora falam de carência e validação. Responda com carinho e honestidade.',
@@ -56,6 +61,7 @@ export const BLOCOS = [
   },
   {
     id: 'D',
+    curta: 0,
     nome: 'Limites e comunicação',
     rotuloForca: 'Limites e comunicação',
     intro: 'Agora vamos falar de limites e da sua voz nas conversas.',
@@ -70,6 +76,7 @@ export const BLOCOS = [
   },
   {
     id: 'E',
+    curta: 4,
     nome: 'Disponibilidade e qualidade da relação',
     rotuloForca: 'Qualidade da relação',
     intro: 'Por último, sobre a relação que você vive (ou viveu mais recentemente).',
@@ -85,14 +92,15 @@ export const BLOCOS = [
 ];
 
 // Perguntas qualificadoras: não entram na pontuação, personalizam a devolutiva e o CTA.
+// Perguntas qualificadoras: não entram na pontuação (o desejo só desempata), personalizam a devolutiva e o CTA.
 export const QUALIFICADORAS = {
   momento: {
     pergunta: 'Em qual momento você está hoje?',
     opcoes: {
       solteira: 'Estou solteira e quero me preparar para escolher melhor.',
       conhecendo: 'Estou conhecendo alguém e quero enxergar a situação com mais clareza.',
-      fortalecer: 'Estou em um relacionamento e quero fortalecê-lo.',
-      duvidas: 'Estou em um relacionamento e tenho dúvidas ou conflitos recorrentes.',
+      feliz: 'Estou feliz no meu relacionamento, mas melhorar sempre é bom.',
+      conflitos: 'Estou em um relacionamento com conflitos recorrentes.',
       recuperando: 'Estou encerrando ou me recuperando de uma relação.',
       nao_informado: 'Prefiro não responder.',
     },
@@ -108,55 +116,21 @@ export const QUALIFICADORAS = {
       reconstrucao: 'Reconstrução depois de uma relação difícil.',
     },
   },
-  formato: {
-    pergunta: 'Qual formato de apoio faria mais sentido para você?',
-    opcoes: {
-      conteudos: 'Conteúdos curtos e exercícios práticos.',
-      aulas: 'Aulas ou encontros guiados.',
-      comunidade: 'Uma comunidade para trocar experiências com outras mulheres.',
-      plano: 'Um plano organizado para acompanhar meu progresso.',
-      nao_sei: 'Ainda não sei; quero entender melhor.',
-    },
-  },
-  tempo: {
-    pergunta: 'Quanto tempo você consegue reservar por semana para essa jornada?',
-    opcoes: {
-      ate15: 'Até 15 minutos.',
-      '15a30': 'De 15 a 30 minutos.',
-      '30a60': 'De 30 a 60 minutos.',
-      mais60: 'Mais de 1 hora.',
-      nao_sei: 'Ainda não consigo estimar.',
-    },
-  },
-  frase: {
-    pergunta: 'Qual frase mais representa seu momento?',
-    opcoes: {
-      confiar: '“Eu quero voltar a confiar em mim.”',
-      limites: '“Eu preciso aprender a colocar limites.”',
-      migalhas: '“Eu quero parar de aceitar migalhas.”',
-      saudavel: '“Eu quero construir uma relação mais saudável.”',
-      reorganizar: '“Eu preciso me reorganizar depois de uma experiência difícil.”',
-    },
-  },
+};
+
+// Pergunta aberta (opcional): vai só para a IA personalizar a devolutiva, não é gravada no CRM.
+export const PERGUNTA_ABERTA = {
+  pergunta: 'Em poucas palavras, o que mais pesa no seu coração hoje?',
+  dica: 'É opcional. O que você escrever serve só para personalizar o seu resultado.',
+  max: 400,
 };
 
 // Triagem de cuidado: nunca soma no perfil, só decide se a tela prioriza segurança.
 export const TRIAGEM = {
-  segura: {
-    pergunta: 'Você se sente segura para responder a este quiz neste momento?',
-    opcoes: { sim: 'Sim', nao: 'Não', prefiro_nao: 'Prefiro não responder' },
-  },
-  controle: {
-    pergunta: 'Atualmente, alguém controla seu dinheiro, celular, deslocamentos, amizades ou contatos de forma que causa medo ou dependência?',
-    opcoes: { nao: 'Não', as_vezes: 'Às vezes', sim: 'Sim', prefiro_nao: 'Prefiro não responder' },
-  },
-  violencia: {
-    pergunta: 'Você já sofreu ameaça, agressão, humilhação grave ou coerção em uma relação atual ou recente?',
-    opcoes: { nao: 'Não', nao_sei: 'Não tenho certeza', sim: 'Sim', prefiro_nao: 'Prefiro não responder' },
-  },
-  ajuda: {
-    pergunta: 'Você sente que precisa de ajuda profissional ou apoio de alguém de confiança para lidar com sua situação atual?',
-    opcoes: { nao: 'Não agora', talvez: 'Talvez', sim: 'Sim', prefiro_nao: 'Prefiro não responder' },
+  risco: {
+    pergunta: 'Hoje, você vive alguma situação de ameaça, agressão, humilhação ou controle do seu dinheiro, celular ou amizades?',
+    dica: 'Esta pergunta existe para cuidar de você e não entra no resultado.',
+    opcoes: { nao: 'Não', sim: 'Sim', prefiro_nao: 'Prefiro não responder' },
   },
 };
 
@@ -190,52 +164,50 @@ export const PERFIS = {
 
 // Ordem usada para desempate exato.
 const PRIORIDADE = ['B', 'D', 'C', 'A', 'E'];
-// Diferença (em pontos de 0–100) abaixo da qual dois blocos viram "trilhas complementares".
-const MARGEM_COMPLEMENTAR = 10;
+// Com uma frase por área, o desejo declarado pesa como desempate entre áreas parecidas.
+const DESEJO_PARA_BLOCO = { autoestima: 'B', limites: 'D', clareza: 'A', comunicacao: 'D', independencia: 'C', reconstrucao: 'B' };
+const PESO_DESEJO = 25;
 
 /** O bloco E só faz sentido para quem vive ou viveu recentemente uma relação. */
 export function blocosAplicaveis(momento) {
   return BLOCOS.filter((b) => !(b.id === 'E' && momento === 'solteira'));
 }
 
+/** Como a área aparece no mapa do resultado (com 3 níveis, palavras dizem mais que porcentagem). */
+export function nivelDaForca(forca) {
+  if (forca >= 100) return 'Fortalecida';
+  if (forca >= 50) return 'Em construção';
+  return 'Pede atenção';
+}
+
 /**
- * respostas: { A: [0..4 x5], B: [...], ... }
- * Retorna força (0–100, quanto maior melhor) e necessidade por bloco, perfil principal e complementar.
+ * respostas: { A: [0..2], B: [...], ... } — uma resposta por área na versão de captação.
+ * Retorna força (0–100, quanto maior melhor) por área, perfil principal e complementar.
  */
-export function calcularResultado(respostas, momento) {
+export function calcularResultado(respostas, momento, desejo) {
   const blocos = blocosAplicaveis(momento);
   const placar = blocos.map((b) => {
     const valores = respostas[b.id];
-    if (!Array.isArray(valores) || valores.length !== b.perguntas.length) {
-      throw new Error(`Respostas incompletas no bloco ${b.id}`);
-    }
-    const soma = valores.reduce((acc, v) => {
-      const n = Number(v);
-      if (!Number.isInteger(n) || n < 0 || n > 4) throw new Error(`Resposta inválida no bloco ${b.id}`);
-      return acc + n;
-    }, 0);
-    const max = b.perguntas.length * 4;
-    const forca = Math.round(((b.invertido ? max - soma : soma) / max) * 100);
-    return { id: b.id, nome: b.rotuloForca, soma, forca, necessidade: 100 - forca };
+    if (!Array.isArray(valores) || valores.length !== 1) throw new Error(`Resposta faltando na área ${b.id}`);
+    const v = Number(valores[0]);
+    if (!Number.isInteger(v) || v < 0 || v > MAX_ESCALA) throw new Error(`Resposta inválida na área ${b.id}`);
+    const forca = Math.round(((b.invertido ? MAX_ESCALA - v : v) / MAX_ESCALA) * 100);
+    const necessidade = 100 - forca + (DESEJO_PARA_BLOCO[desejo] === b.id ? PESO_DESEJO : 0);
+    return { id: b.id, nome: b.rotuloForca, forca, nivel: nivelDaForca(forca), necessidade };
   });
 
   const ordenado = [...placar].sort(
     (x, y) => y.necessidade - x.necessidade || PRIORIDADE.indexOf(x.id) - PRIORIDADE.indexOf(y.id),
   );
-  const principal = ordenado[0];
-  const segundo = ordenado[1];
-  const complementar =
-    segundo && principal.necessidade - segundo.necessidade <= MARGEM_COMPLEMENTAR ? segundo.id : null;
-
+  const [principal, segundo] = ordenado;
+  const complementar = segundo && segundo.necessidade === principal.necessidade ? segundo.id : null;
   return { placar, perfil: principal.id, complementar };
 }
 
+// Palavras que, escritas na pergunta aberta, pedem que o resultado priorize segurança.
+const SINAIS_DE_RISCO = /agred|agress|me bate|bateu|apanh|ameaç|violên|violenc|abus|estupr|me machuca|medo dele|me mat|suicid|me forç|me obrig/i;
+
 /** true quando a participante sinalizou risco: a tela prioriza cuidado e não oferta. */
-export function precisaCuidado(triagem = {}) {
-  return (
-    triagem.segura === 'nao' ||
-    triagem.controle === 'sim' ||
-    triagem.controle === 'as_vezes' ||
-    triagem.violencia === 'sim'
-  );
+export function precisaCuidado(triagem = {}, textoAberto = '') {
+  return triagem.risco === 'sim' || SINAIS_DE_RISCO.test(textoAberto || '');
 }
