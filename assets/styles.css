@@ -208,3 +208,15 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
   .mapa .barra i{ width:var(--alvo); }
   .mapa .rot em{ opacity:1; }
 }
+
+/* ---------- faixa: indo para a comunidade ---------- */
+.faixa-comunidade{
+  position:fixed; left:12px; right:12px; bottom:max(12px, env(safe-area-inset-bottom)); z-index:20;
+  max-width:520px; margin:0 auto; padding:18px 18px 14px; border-radius:22px;
+  background:var(--bordo); color:var(--papel); box-shadow:0 18px 40px -12px rgba(46,10,20,.55);
+  animation:surgir .3s ease both;
+}
+.faixa-comunidade p{ font-size:16px; line-height:1.45; }
+.faixa-acoes{ display:flex; align-items:center; gap:14px; margin-top:14px; }
+.faixa-acoes .btn{ width:auto; flex:1; padding:14px 18px; }
+.link-claro{ background:none; border:0; color:#E9D6D0; text-decoration:underline; font-size:15px; cursor:pointer; padding:8px 4px; }

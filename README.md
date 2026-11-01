@@ -15,7 +15,7 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 - **Próximos 7 dias:** sempre uma lista com os 7 itens escritos (IA e texto pronto).
 - **OpenAI:** `api/resultado.js` envia o perfil e as respostas qualificadoras e recebe a devolutiva em JSON estruturado (acolhimento, o que o padrão sinaliza, forças, exercício de 3 minutos, próximo passo, convite). O prompt impede linguagem de diagnóstico, promessas e urgência.
 - **Plano B:** sem chave, com erro ou com demora acima de 20 s, entra a devolutiva pronta de `assets/fallback.js`. O quiz nunca trava.
-- **PDF:** gerado no navegador (jsPDF, servido localmente e baixado só no clique), com botão clicável para a comunidade.
+- **Depois do resultado:** o PDF (jsPDF, gerado no navegador) baixa sozinho e uma faixa conta `segundosAteComunidade` (8 s, em `assets/config.js`) antes de levar a pessoa para a página da comunidade, com "Ir agora" e "Ficar no resultado". Acontece uma vez por sessão e nunca para quem sinalizou risco. O botão "Baixar meu mapa em PDF" continua na tela.
 - **Rastreio:** as UTMs, o `fbclid`, o `mc_id` e o `nome` da URL são guardados e repassados ao CTA da comunidade (`utm_content=perfil_X`) e ao mini CRM. Os eventos `quiz_inicio`, `quiz_concluido`, `quiz_pdf_baixado` e `quiz_clique_comunidade` vão para o `dataLayer` e o `fbq` (se o Pixel estiver instalado).
 
 ## Configuração

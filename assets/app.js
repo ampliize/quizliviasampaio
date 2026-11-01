@@ -414,6 +414,7 @@ function resultado() {
       const tela = telaResultado(dados);
       tela.classList.add('tela');
       app.appendChild(tela);
+      seguirDepoisDoResultado(dados);
     })
     .catch(() => clearInterval(giro));
   return el;
@@ -453,6 +454,62 @@ export function linkComunidade(dados) {
   const params = { ...CONFIG.utmPadrao, ...estado.rastreio, utm_content: `perfil_${dados.perfil}` };
   Object.entries(params).forEach(([k, v]) => v && url.searchParams.set(k, v));
   return url.toString();
+}
+
+// Pedido da Lívia: o PDF baixa sozinho e a pessoa segue direto para a comunidade.
+// Uma faixa com contagem deixa ela ficar no resultado, se quiser. Só acontece uma vez por sessão,
+// e nunca para quem sinalizou risco (essa pessoa não recebe oferta).
+async function seguirDepoisDoResultado(dados) {
+  if (dados.cuidado || estado.seguiuAutomatico) return;
+  estado.seguiuAutomatico = true;
+  salvar();
+  let baixou = false;
+  try {
+    await gerarPdf({ dados, nome: estado.lead.nome, link: linkComunidade(dados) });
+    baixou = true;
+    rastrear('quiz_pdf_baixado', { perfil: dados.perfil, automatico: true });
+    registrarCrm('pdf');
+  } catch {
+    /* o botão "Baixar meu mapa em PDF" continua na tela */
+  }
+  contagemParaComunidade(dados, baixou);
+}
+
+function contagemParaComunidade(dados, baixou) {
+  const link = linkComunidade(dados);
+  let restam = CONFIG.segundosAteComunidade;
+  const texto = h('p', {});
+  const atualizar = () => {
+    texto.textContent = `${baixou ? 'Seu mapa foi baixado. ' : ''}Em ${restam} segundo${restam === 1 ? '' : 's'} você vai conhecer a comunidade A-Livia-ndo.`;
+  };
+  const irParaComunidade = () => {
+    clearInterval(relogio);
+    rastrear('quiz_clique_comunidade', { perfil: dados.perfil, automatico: true });
+    registrarCrm('comunidade');
+    location.href = link;
+  };
+  const ficar = () => {
+    clearInterval(relogio);
+    faixa.remove();
+  };
+  const faixa = h(
+    'aside',
+    { class: 'faixa-comunidade', role: 'status' },
+    texto,
+    h(
+      'div',
+      { class: 'faixa-acoes' },
+      h('button', { class: 'btn btn-claro', type: 'button', onclick: irParaComunidade }, 'Ir agora'),
+      h('button', { class: 'link-claro', type: 'button', onclick: ficar }, 'Ficar no resultado'),
+    ),
+  );
+  atualizar();
+  document.body.appendChild(faixa);
+  const relogio = setInterval(() => {
+    restam -= 1;
+    if (restam <= 0) irParaComunidade();
+    else atualizar();
+  }, 1000);
 }
 
 function telaResultado(dados) {
