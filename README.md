@@ -4,7 +4,7 @@ Quiz de autoconhecimento da Lívia Sampaio (@lliviasampaio), primeira etapa do f
 
 ```
 Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ → resultado na tela + PDF
-→ página da comunidade A-Livia-ndo → checkout Cakto (R$ 39,90/mês)
+→ botão do e-book "A mulher que aprende a escolher, não perde tempo" → aliviando.com.br
 ```
 
 ## Como funciona
@@ -15,12 +15,12 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 - **Próximos 7 dias:** sempre uma lista com os 7 itens escritos (IA e texto pronto).
 - **OpenAI:** `api/resultado.js` envia o perfil e as respostas qualificadoras e recebe a devolutiva em JSON estruturado (acolhimento, o que o padrão sinaliza, forças, exercício de 3 minutos, próximo passo, convite). O prompt impede linguagem de diagnóstico, promessas e urgência.
 - **Plano B:** sem chave, com erro ou com demora acima de 20 s, entra a devolutiva pronta de `assets/fallback.js`. O quiz nunca trava.
-- **Depois do resultado:** o PDF (jsPDF, gerado no navegador) baixa sozinho e uma faixa conta `segundosAteComunidade` (8 s, em `assets/config.js`) antes de levar a pessoa para a página da comunidade, com "Ir agora" e "Ficar no resultado". Acontece uma vez por sessão e nunca para quem sinalizou risco. O botão "Baixar meu mapa em PDF" continua na tela.
-- **Rastreio:** as UTMs, o `fbclid`, o `mc_id` e o `nome` da URL são guardados e repassados ao CTA da comunidade (`utm_content=perfil_X`) e ao mini CRM. Os eventos `quiz_inicio`, `quiz_concluido`, `quiz_pdf_baixado` e `quiz_clique_comunidade` vão para o `dataLayer` e o `fbq` (se o Pixel estiver instalado).
+- **Depois do resultado:** o PDF (jsPDF, gerado no navegador) baixa sozinho, uma vez por sessão. Depois das dicas dos 7 dias vem a oferta do e-book, com o botão "Quero o meu e-book" para `ofertaUrl` (`assets/config.js`, onde também ficam o título e os itens do e-book). Não há redirecionamento automático. Quem sinalizou risco não recebe oferta nem download automático.
+- **Rastreio:** as UTMs, o `fbclid`, o `mc_id` e o `nome` da URL são guardados e repassados ao botão do e-book (`utm_content=perfil_X`) e ao mini CRM. Os eventos `quiz_inicio`, `quiz_concluido`, `quiz_pdf_baixado` e `quiz_clique_ebook` vão para o `dataLayer` e o `fbq` (se o Pixel estiver instalado).
 
 ## Configuração
 
-1. `assets/config.js`: URL da página da comunidade e UTMs padrão.
+1. `assets/config.js`: URL da página do e-book, texto da oferta e UTMs padrão.
 2. Variáveis de ambiente (veja `.env.example`):
    - `OPENAI_API_KEY`: obrigatória para a devolutiva com IA.
    - `OPENAI_MODEL`: padrão `gpt-4o-mini`.
@@ -31,7 +31,7 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 
 Cada pessoa que abre o link vira uma sessão. O quiz avisa o servidor a cada etapa alcançada (abriu, momento de vida, partes A–E, perguntas finais, triagem, contato, resultado, PDF, clique na comunidade), com a pergunta exata em que ela estava. O painel mostra:
 
-- totais do período (abriram, viram o resultado, deixaram contato, baixaram o PDF, clicaram na comunidade);
+- totais do período (abriram, viram o resultado, deixaram contato, baixaram o PDF, clicaram no e-book);
 - funil com quantas pessoas se perderam entre uma etapa e outra;
 - ranking de onde mais param e perfis de quem concluiu;
 - **quem é o público**: distribuição de filhos, como se sente com a vida, prioridade, renda e área que mais precisa melhorar;

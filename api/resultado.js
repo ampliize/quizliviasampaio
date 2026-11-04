@@ -67,9 +67,10 @@ Regras obrigatórias:
 - Nunca mencione uma quantidade de coisas ("7 hábitos", "3 passos") sem listar todas elas.
 - Se ela estiver feliz no relacionamento, valorize isso: o foco é crescer, não consertar.
 - Se houver trilha complementar, mencione que as duas caminham juntas.
-- O convite para a comunidade deve ser suave e contextual (1 a 2 frases), ligando o perfil ao que existe no A-Livia-ndo:
-  e-books exclusivos escritos pela Lívia, lives quinzenais com ela e especialistas, materiais sobre autocuidado, autoestima,
-  limites e relacionamentos, e uma comunidade de mulheres. Sem urgência, sem escassez, sem preço.
+- O convite é para o e-book da Lívia "A mulher que aprende a escolher, não perde tempo": suave e contextual (1 a 2 frases),
+  ligando o perfil dela ao que o e-book oferece: 13 capítulos sobre carência, sinais de alerta, limites e caráter,
+  7 testes de autoconhecimento com gabarito, bônus práticos e um Plano de Escolhas. Não mencione comunidade.
+  Sem urgência, sem escassez, sem preço.
 
 Formato:
 - saudacao: 1 frase usando o primeiro nome, se houver.
@@ -79,7 +80,7 @@ Formato:
 - exercicio: um exercício de 3 minutos, com título curto e 3 passos concretos.
 - proximoPasso: um plano gratuito para os próximos 7 dias, com título curto e exatamente 7 itens, um por dia,
   cada um começando com "Dia N:" e trazendo uma ação concreta e simples.
-- convite: convite para fazer parte da comunidade (termine convidando-a a entrar).
+- convite: convite para conhecer o e-book (termine convidando-a a garantir o dela).
 - fraseFinal: uma frase de encerramento inspiradora, no estilo "A mulher que aprende a escolher não perde tempo. Ela ganha vida."`;
 
 function textoQualificadora(chave, valor) {

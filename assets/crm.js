@@ -62,7 +62,7 @@ const guardarSenha = (s) => {
 };
 
 function situacao(l) {
-  if (l.clicou_comunidade) return { texto: 'Clicou na comunidade', tipo: 'ok' };
+  if (l.clicou_comunidade) return { texto: 'Clicou no e-book', tipo: 'ok' };
   if (l.concluido_em) return { texto: l.baixou_pdf ? 'Viu o resultado e baixou o PDF' : 'Viu o resultado', tipo: 'ok' };
   const ativa = Date.now() - new Date(l.ultima_atividade) < ATIVA_MINUTOS * 60000;
   const onde = NOMES_ETAPA[l.etapa] || l.etapa;
@@ -134,7 +134,7 @@ function desenhar() {
       ['Viram o resultado', t.concluiram, pct(t.concluiram, t.sessoes)],
       ['Deixaram contato', t.com_contato, pct(t.com_contato, t.sessoes)],
       ['Baixaram o PDF', t.baixaram_pdf, pct(t.baixaram_pdf, t.concluiram)],
-      ['Clicaram na comunidade', t.clicaram_comunidade, pct(t.clicaram_comunidade, t.concluiram)],
+      ['Clicaram no e-book', t.clicaram_comunidade, pct(t.clicaram_comunidade, t.concluiram)],
     ].map(([rotulo, n, taxa]) =>
       h('div', { class: 'total' }, h('strong', {}, num(n)), h('span', {}, rotulo), taxa && h('em', {}, taxa === '0%' ? '' : taxa)),
     ),

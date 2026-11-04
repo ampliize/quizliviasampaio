@@ -167,8 +167,8 @@ export function devolutivaPadrao({ perfil, complementar, nome, orgulho }) {
     exercicio: base.exercicio,
     proximoPasso: base.proximoPasso,
     convite:
-      `No A-Livia-ndo, a trilha de ${p.trilha.toLowerCase()} transforma essa reflexão em prática: ` +
-      'e-books exclusivos, lives quinzenais com a Lívia e especialistas, e uma comunidade de mulheres que também estão aprendendo a se escolher.',
+      `Se você quer aprofundar a trilha de ${p.trilha.toLowerCase()}, o e-book da Lívia é o próximo passo: ` +
+      'um guia para parar de repetir padrões e aprender a se escolher, com testes e exercícios para fazer no seu ritmo.',
     fraseFinal: 'A mulher que aprende a escolher não perde tempo. Ela ganha vida.',
     origem: 'padrao',
   };

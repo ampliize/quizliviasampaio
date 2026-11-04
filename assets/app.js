@@ -414,7 +414,7 @@ function resultado() {
       const tela = telaResultado(dados);
       tela.classList.add('tela');
       app.appendChild(tela);
-      seguirDepoisDoResultado(dados);
+      baixarPdfAutomatico(dados);
     })
     .catch(() => clearInterval(giro));
   return el;
@@ -449,74 +449,33 @@ async function buscarResultado() {
   return dados;
 }
 
-export function linkComunidade(dados) {
-  const url = new URL(CONFIG.comunidadeUrl);
+export function linkOferta(dados) {
+  const url = new URL(CONFIG.ofertaUrl);
   const params = { ...CONFIG.utmPadrao, ...estado.rastreio, utm_content: `perfil_${dados.perfil}` };
   Object.entries(params).forEach(([k, v]) => v && url.searchParams.set(k, v));
   return url.toString();
 }
 
-// Pedido da Lívia: o PDF baixa sozinho e a pessoa segue direto para a comunidade.
-// Uma faixa com contagem deixa ela ficar no resultado, se quiser. Só acontece uma vez por sessão,
-// e nunca para quem sinalizou risco (essa pessoa não recebe oferta).
-async function seguirDepoisDoResultado(dados) {
-  if (dados.cuidado || estado.seguiuAutomatico) return;
-  estado.seguiuAutomatico = true;
+// O PDF baixa sozinho quando o resultado aparece (uma vez por sessão). Quem sinalizou risco não
+// recebe nada automático. O botão do e-book fica no fim, depois das dicas, sem redirecionar sozinho.
+async function baixarPdfAutomatico(dados) {
+  if (dados.cuidado || estado.pdfAutomatico) return;
+  estado.pdfAutomatico = true;
   salvar();
-  let baixou = false;
   try {
-    await gerarPdf({ dados, nome: estado.lead.nome, link: linkComunidade(dados) });
-    baixou = true;
+    await gerarPdf({ dados, nome: estado.lead.nome, link: linkOferta(dados) });
     rastrear('quiz_pdf_baixado', { perfil: dados.perfil, automatico: true });
     registrarCrm('pdf');
   } catch {
     /* o botão "Baixar meu mapa em PDF" continua na tela */
   }
-  contagemParaComunidade(dados, baixou);
-}
-
-function contagemParaComunidade(dados, baixou) {
-  const link = linkComunidade(dados);
-  let restam = CONFIG.segundosAteComunidade;
-  const texto = h('p', {});
-  const atualizar = () => {
-    texto.textContent = `${baixou ? 'Seu mapa foi baixado. ' : ''}Em ${restam} segundo${restam === 1 ? '' : 's'} você vai conhecer a comunidade A-Livia-ndo.`;
-  };
-  const irParaComunidade = () => {
-    clearInterval(relogio);
-    rastrear('quiz_clique_comunidade', { perfil: dados.perfil, automatico: true });
-    registrarCrm('comunidade');
-    location.href = link;
-  };
-  const ficar = () => {
-    clearInterval(relogio);
-    faixa.remove();
-  };
-  const faixa = h(
-    'aside',
-    { class: 'faixa-comunidade', role: 'status' },
-    texto,
-    h(
-      'div',
-      { class: 'faixa-acoes' },
-      h('button', { class: 'btn btn-claro', type: 'button', onclick: irParaComunidade }, 'Ir agora'),
-      h('button', { class: 'link-claro', type: 'button', onclick: ficar }, 'Ficar no resultado'),
-    ),
-  );
-  atualizar();
-  document.body.appendChild(faixa);
-  const relogio = setInterval(() => {
-    restam -= 1;
-    if (restam <= 0) irParaComunidade();
-    else atualizar();
-  }, 1000);
 }
 
 function telaResultado(dados) {
   const perfil = PERFIS[dados.perfil];
   const comp = dados.complementar ? PERFIS[dados.complementar] : null;
   const d = dados.devolutiva;
-  const link = linkComunidade(dados);
+  const link = linkOferta(dados);
 
   // Revelação do mapa (adaptado do Animated Chart, 21st.dev): as barras saem do zero com mola,
   // uma após a outra, quando o mapa entra na tela; o número aparece na metade do movimento.
@@ -573,24 +532,28 @@ function telaResultado(dados) {
 
   const proximo = proximoPassoEmLista(d.proximoPasso);
 
+  // Oferta do e-book: entra logo depois das dicas dos 7 dias. Quem sinalizou risco não recebe oferta.
   const convite =
     !dados.cuidado &&
     h(
       'section',
       { class: 'convite' },
-      h('h3', {}, 'Quer fazer parte da comunidade A-Livia-ndo?'),
+      h('p', { class: 'convite-rotulo' }, 'Para continuar a sua jornada'),
+      h('h3', {}, CONFIG.ebook.titulo),
       h('p', {}, d.convite),
+      h('ul', { class: 'convite-inclui' }, CONFIG.ebook.inclui.map((item) => h('li', {}, item))),
       h(
         'a',
         {
           class: 'btn btn-claro',
           href: link,
           onclick: () => {
-            rastrear('quiz_clique_comunidade', { perfil: dados.perfil });
+            rastrear('quiz_clique_ebook', { perfil: dados.perfil });
+            // no CRM o evento continua se chamando "comunidade" (coluna clicou_comunidade)
             registrarCrm('comunidade');
           },
         },
-        'Quero fazer parte da comunidade',
+        CONFIG.ebook.botao,
       ),
     );
 
@@ -629,8 +592,8 @@ function telaResultado(dados) {
       h('h3', {}, proximo.titulo),
       h('ul', { class: 'passos-semana' }, proximo.passos.map((p) => h('li', {}, p))),
     ),
-    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-contorno', type: 'button', onclick: baixar }, 'Baixar meu mapa em PDF')),
     convite,
+    h('div', { class: 'acoes' }, h('button', { class: 'btn btn-contorno', type: 'button', onclick: baixar }, 'Baixar meu mapa em PDF')),
     h('p', { class: 'fecho' }, d.fraseFinal),
     h(
       'p',

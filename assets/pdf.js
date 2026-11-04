@@ -180,8 +180,8 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFillColor(...COR.vinho);
     doc.roundedRect(M, topoCaixa, LARG, alt, 5, 5, 'F');
     y += 9;
-    paragrafo(`Sua trilha: ${perfil.trilha.toLowerCase()}`, { tam: 9.5, cor: [220, 194, 154], estilo: 'bold', alinhar: 'center', esp: 2 });
-    paragrafo('Continue essa jornada no A-Livia-ndo', { tam: 14, cor: [253, 241, 238], estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 2 });
+    paragrafo('Para continuar a sua jornada', { tam: 9.5, cor: [220, 194, 154], estilo: 'bold', alinhar: 'center', esp: 2 });
+    paragrafo(CONFIG.ebook.titulo, { tam: 14, cor: [253, 241, 238], estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 2 });
     paragrafo(d.convite, { cor: [233, 214, 208], x: M + 8, larg: LARG - 16, esp: 3 });
     const bw = 104;
     const bx = (L - bw) / 2;
@@ -190,7 +190,7 @@ export async function gerarPdf({ dados, nome, link }) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10.5);
     doc.setTextColor(...COR.vinho);
-    doc.text('Conhecer o A-Livia-ndo', L / 2, y + 7, { align: 'center' });
+    doc.text(limpar(CONFIG.ebook.botao), L / 2, y + 7, { align: 'center' });
     doc.link(bx, y, bw, 11, { url: link });
     y = topoCaixa + alt + 6;
   }
