@@ -18,6 +18,7 @@ const COR_AREA = {
   C: [221, 189, 170],
   D: [215, 189, 202],
   E: [203, 207, 192],
+  F: [199, 206, 216],
 };
 
 // As fontes padrão do PDF só cobrem Latin-1: troca o que fica fora disso por equivalentes simples.
@@ -111,10 +112,10 @@ export async function gerarPdf({ dados, nome, link }) {
   y = 60;
 
   paragrafo(d.saudacao, { tam: 12, cor: COR.textoSuave, estilo: 'italic', fonte: 'times', alinhar: 'center', esp: 5 });
-  paragrafo('Seu perfil educativo de hoje', { tam: 9.5, cor: COR.dourado, estilo: 'bold', alinhar: 'center', esp: 3 });
+  paragrafo(`A área que mais pede atenção hoje: ${perfil.trilha.toLowerCase()}`, { tam: 9.5, cor: COR.dourado, estilo: 'bold', alinhar: 'center', esp: 3 });
   paragrafo(perfil.nome, { tam: 22, cor: COR.vinho, estilo: 'bold', fonte: 'times', alinhar: 'center', esp: 4 });
   paragrafo(`"${perfil.frase}"`, { tam: 12, cor: COR.rosa, estilo: 'italic', fonte: 'times', alinhar: 'center', esp: 3 });
-  if (comp) paragrafo(`Trilha complementar: ${comp.trilha}`, { tam: 9.5, cor: COR.textoSuave, alinhar: 'center', esp: 3 });
+  if (comp) paragrafo(`Também pede atenção: ${comp.trilha.toLowerCase()}`, { tam: 9.5, cor: COR.textoSuave, alinhar: 'center', esp: 3 });
   y += 4;
 
   if (dados.cuidado) {

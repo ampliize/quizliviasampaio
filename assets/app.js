@@ -111,7 +111,7 @@ function roteiro() {
     const campo = BLOCOS.some((b) => b.id === trecho) ? trecho : 'neutro';
     if (item.tipo === 'escala') {
       const bloco = BLOCOS.find((b) => b.id === item.bloco);
-      telas.push({ tipo: 'escala', bloco, texto: bloco.perguntas[bloco.curta], trecho, campo, etapa: item.etapa });
+      telas.push({ tipo: 'escala', bloco, texto: bloco.pergunta, trecho, campo, etapa: item.etapa });
     } else telas.push({ ...item, trecho, campo });
   });
   telas.push({ tipo: 'lead', trecho: 'fim', campo: 'neutro' });
@@ -545,7 +545,7 @@ function telaResultado(dados) {
       h(
         'a',
         {
-          class: 'btn btn-claro',
+          class: 'btn btn-claro btn-gigante',
           href: link,
           onclick: () => {
             rastrear('quiz_clique_ebook', { perfil: dados.perfil });
@@ -566,11 +566,11 @@ function telaResultado(dados) {
       h('p', { class: 'saudacao' }, d.saudacao),
       h('h1', {}, perfil.nome),
       h('p', { class: 'frase' }, perfil.frase),
-      comp && h('p', { class: 'comp' }, `Seu momento também conversa com a trilha de ${comp.trilha.toLowerCase()}.`),
+      h('p', { class: 'comp' }, comp ? `As áreas que mais pedem atenção hoje: ${perfil.trilha.toLowerCase()} e ${comp.trilha.toLowerCase()}.` : `A área que mais pede atenção hoje: ${perfil.trilha.toLowerCase()}.`),
     ),
     cuidado,
     h('p', { class: 'acolhe' }, d.acolhimento),
-    h('section', { class: 'bloco' }, h('h3', {}, 'O que esse padrão pode estar dizendo'), d.oQueSinaliza.map((t) => h('p', {}, t))),
+    h('section', { class: 'bloco' }, h('h3', {}, 'O que essa área está pedindo'), d.oQueSinaliza.map((t) => h('p', {}, t))),
     h(
       'section',
       { class: 'bloco' },
@@ -592,9 +592,9 @@ function telaResultado(dados) {
       h('h3', {}, proximo.titulo),
       h('ul', { class: 'passos-semana' }, proximo.passos.map((p) => h('li', {}, p))),
     ),
+    h('p', { class: 'fecho' }, d.fraseFinal),
     convite,
     h('div', { class: 'acoes' }, h('button', { class: 'btn btn-contorno', type: 'button', onclick: baixar }, 'Baixar meu mapa em PDF')),
-    h('p', { class: 'fecho' }, d.fraseFinal),
     h(
       'p',
       { class: 'miudo' },

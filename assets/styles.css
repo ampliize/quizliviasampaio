@@ -9,11 +9,12 @@
   --tinta-suave:#6E4A52;
   --papel:#F6F1EC;
 
-  --A:#E6D5BA;  /* escolha consciente — champanhe */
-  --B:#EBC4C6;  /* amor-próprio — rosa */
-  --C:#DDBDAA;  /* segurança emocional — nude */
-  --D:#D7BDCA;  /* limites e comunicação — malva */
-  --E:#CBCFC0;  /* qualidade da relação — sálvia */
+  --A:#E6D5BA;  /* autoestima — champanhe */
+  --B:#EBC4C6;  /* relacionamento — rosa */
+  --C:#DDBDAA;  /* família — nude */
+  --D:#D7BDCA;  /* carreira e dinheiro — malva */
+  --E:#CBCFC0;  /* corpo e saúde — sálvia */
+  --F:#C7CED8;  /* saúde mental — névoa */
   --neutro:#EFE6E1;
 
   --campo:var(--neutro);
@@ -34,6 +35,7 @@ body[data-campo="B"]{ --campo:var(--B); }
 body[data-campo="C"]{ --campo:var(--C); }
 body[data-campo="D"]{ --campo:var(--D); }
 body[data-campo="E"]{ --campo:var(--E); }
+body[data-campo="F"]{ --campo:var(--F); }
 body[data-campo="escuro"]{ --campo:var(--bordo); color:var(--papel); }
 body[data-campo="papel"]{ --campo:var(--papel); }
 
@@ -180,6 +182,8 @@ body[data-campo="escuro"] :focus-visible{ outline-color:var(--papel); }
 .convite .convite-inclui li{ padding-left:14px; border-left:2px solid var(--ouro); }
 .convite p{ margin-top:14px; color:#E9D6D0; }
 .convite .btn{ margin-top:24px; }
+/* pedido da Lívia: o botão do e-book tem que ser gigante */
+.convite .btn-gigante{ padding:24px 20px; font-size:21px; border-radius:20px; box-shadow:0 14px 30px -12px rgba(0,0,0,.45); }
 
 .cuidado{ margin-top:28px; border-radius:24px; padding:24px 22px; background:#fff; box-shadow:inset 0 0 0 2px var(--bordo); }
 .cuidado h3{ font-size:23px; margin-bottom:10px; }

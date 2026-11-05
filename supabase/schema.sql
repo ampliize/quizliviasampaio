@@ -52,7 +52,7 @@ alter table public.quiz_eventos enable row level security;
 create or replace function public.quiz_etapa_ordem(p_etapa text)
 returns int language sql immutable as $$
   select coalesce(array_position(
-    array['capa','momento','A','B','C','D','E','qualificadoras','cuidado','contato','resultado'],
+    array['capa','momento','A','B','C','D','E','F','qualificadoras','cuidado','contato','resultado'],
     p_etapa) - 1, 0)
 $$;
 
@@ -127,7 +127,7 @@ returns jsonb language sql stable as $$
   ),
   etapas as (
     select e, ord - 1 as ordem
-    from unnest(array['capa','momento','A','B','C','D','E','qualificadoras','cuidado','contato','resultado']) with ordinality as t(e, ord)
+    from unnest(array['capa','momento','A','B','C','D','E','F','qualificadoras','cuidado','contato','resultado']) with ordinality as t(e, ord)
   )
   select jsonb_build_object(
     'funil', (

@@ -9,10 +9,10 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 
 ## Como funciona
 
-- **Perguntas (versão de captação, 12):** a ordem está em `ROTEIRO` (`assets/quiz-data.js`). Primeiro o perfil da mulher (momento, filhos, como se sente com a vida, prioridade), depois autoestima (uma frase por área A–D, com Nunca / Às vezes / Sempre, e "qual qualidade te dá orgulho" para escrever), e por fim renda, "o que gostaria de mudar" (para escrever) e a área da vida que mais precisa melhorar. As 25 frases do documento-base continuam em `perguntas`, para uma versão completa futura dentro da comunidade.
-- **Perfil:** a área com maior necessidade (o bloco C é lido de forma invertida); a área que ela quer melhorar desempata. Empate exato vira "trilha complementar". O cálculo roda também no servidor.
-- **Perguntas abertas:** vão só para a IA personalizar a devolutiva e não são gravadas no CRM. A pergunta explícita sobre violência saiu a pedido da Lívia; se o texto escrito trouxer sinais de risco (ameaça, agressão etc.), o resultado mostra o Ligue 180 e esconde a oferta.
-- **Próximos 7 dias:** sempre uma lista com os 7 itens escritos (IA e texto pronto).
+- **Perguntas (12):** a ordem está em `ROTEIRO` (`assets/quiz-data.js`). Primeiro o perfil da mulher (momento, filhos, como se sente com a vida), depois uma frase por área da vida (autoestima, relacionamento, família, carreira e dinheiro, corpo e saúde, saúde mental) com Nunca / Às vezes / Sempre, a pergunta aberta "qual qualidade te dá orgulho", a renda e, por último, a área que ela sente que mais precisa melhorar.
+- **Resultado:** a área com a resposta mais baixa é a que "mais pede atenção" (todas as frases são positivas: "Sempre" = área bem). A área que ela escolheu no fim pesa a favor e desempata. Cada área tem o seu título e a sua frase (`PERFIS`), e a frase final é sempre "Seja o grande amor da sua vida.". Empate exato mostra as duas áreas.
+- **Pergunta aberta:** vai só para a IA personalizar a devolutiva e não é gravada no CRM. Se o texto trouxer sinais de risco (ameaça, agressão etc.), o resultado mostra o Ligue 180 e esconde a oferta.
+- **Próximos 7 dias:** sempre uma lista com os 7 itens escritos (IA e texto pronto, um plano por área).
 - **OpenAI:** `api/resultado.js` envia o perfil e as respostas qualificadoras e recebe a devolutiva em JSON estruturado (acolhimento, o que o padrão sinaliza, forças, exercício de 3 minutos, próximo passo, convite). O prompt impede linguagem de diagnóstico, promessas e urgência.
 - **Plano B:** sem chave, com erro ou com demora acima de 20 s, entra a devolutiva pronta de `assets/fallback.js`. O quiz nunca trava.
 - **Depois do resultado:** o PDF (jsPDF, gerado no navegador) baixa sozinho, uma vez por sessão. Depois das dicas dos 7 dias vem a oferta do e-book, com o botão "Quero o meu e-book" para `ofertaUrl` (`assets/config.js`, onde também ficam o título e os itens do e-book). Não há redirecionamento automático. Quem sinalizou risco não recebe oferta nem download automático.
@@ -29,13 +29,13 @@ Reel / Stories → comentário "ALIVIANDO" → ManyChat envia o link → QUIZ �
 
 ## Mini CRM (`/crm`)
 
-Cada pessoa que abre o link vira uma sessão. O quiz avisa o servidor a cada etapa alcançada (abriu, momento de vida, partes A–E, perguntas finais, triagem, contato, resultado, PDF, clique na comunidade), com a pergunta exata em que ela estava. O painel mostra:
+Cada pessoa que abre o link vira uma sessão. O quiz avisa o servidor a cada etapa alcançada (abriu, perfil, cada uma das 6 áreas, renda e área a melhorar, contato, resultado, PDF, clique no e-book), com a pergunta exata em que ela estava. O painel mostra:
 
 - totais do período (abriram, viram o resultado, deixaram contato, baixaram o PDF, clicaram no e-book);
 - funil com quantas pessoas se perderam entre uma etapa e outra;
 - ranking de onde mais param e perfis de quem concluiu;
-- **quem é o público**: distribuição de filhos, como se sente com a vida, prioridade, renda e área que mais precisa melhorar;
-- lista de leads com situação ("Parou em Limites e comunicação, pergunta 18 de 29"), contato, perfil e origem, com busca, filtros e exportação para CSV.
+- **quem é o público**: distribuição de filhos, como se sente com a vida, renda e área que mais precisa melhorar;
+- lista de leads com situação ("Parou em Carreira e dinheiro, pergunta 8 de 12"), contato, perfil e origem, com busca, filtros e exportação para CSV.
 
 Filtros por período (hoje, 7, 30, 90 dias, tudo) e por origem (`utm_source`).
 

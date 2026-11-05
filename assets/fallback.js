@@ -3,20 +3,20 @@
 import { PERFIS } from './quiz-data.js';
 
 const TEXTOS = {
-  B: {
+  A: {
     acolhimento:
       'Que bom que você parou alguns minutos para olhar para si. Isso, por si só, já é um gesto de amor-próprio.',
     sinaliza: [
-      'Talvez você esteja percebendo que, em alguns momentos, a relação ocupa tanto espaço que seus sonhos, amizades ou preferências ficam para depois.',
-      'Isso não diz que há algo errado com você. Diz que a sua própria presença precisa voltar a ter lugar na sua rotina e nas suas decisões.',
+      'Talvez você esteja dando conta de tudo e de todos, e deixando a sua própria imagem e o seu próprio valor para depois.',
+      'Isso não diz que há algo errado com você. Diz que está na hora de você voltar a ser prioridade na sua própria vida.',
     ],
-    forcas: ['Você já reconhece que merece mais espaço', 'Existe vontade real de se reencontrar', 'Você está disposta a se olhar com honestidade'],
+    forcas: ['Você já percebeu que merece mais', 'Existe vontade real de se reencontrar', 'Você tem coragem de se olhar com honestidade'],
     exercicio: {
-      titulo: 'Devolva um espaço para você',
+      titulo: 'O espelho gentil',
       passos: [
-        'Escreva três coisas que eram suas antes de qualquer relação: um sonho, um hobby, uma amizade.',
-        'Escolha uma delas e marque na agenda 20 minutos para ela nesta semana.',
-        'Ao final, anote em uma frase como você se sentiu.',
+        'Pare na frente do espelho e respire fundo três vezes.',
+        'Diga em voz alta três coisas que você admira em você, não só na aparência.',
+        'Escreva a que mais te tocou e deixe em um lugar onde você vai ver amanhã.',
       ],
     },
     proximoPasso: {
@@ -32,116 +32,148 @@ const TEXTOS = {
       ],
     },
   },
-  D: {
-    acolhimento: 'Você chegou até aqui, e isso mostra que a sua voz quer aparecer. Vamos cuidar dela com calma.',
+  B: {
+    acolhimento:
+      'Olhar para a vida amorosa com honestidade é um ato de coragem, e você está fazendo isso agora.',
     sinaliza: [
-      'Você pode saber o que não aceita, mas ainda estar treinando como comunicar e sustentar isso.',
-      'Limite não é ameaça nem castigo: é clareza sobre o que você fará para se proteger.',
+      'Talvez a sua vida amorosa esteja ocupando muito espaço nos seus pensamentos, seja pela falta de alguém, seja por uma relação que pede mais cuidado.',
+      'O amor que você procura começa pela forma como você se trata. Quando você se coloca em primeiro lugar, escolhe e é escolhida com mais clareza.',
     ],
-    forcas: ['Você já percebe o que te incomoda', 'Existe desejo de se posicionar', 'Você valoriza a sua paz'],
+    forcas: ['Você sabe amar e se entregar', 'Você quer relações com mais verdade', 'Existe abertura para crescer a dois ou sozinha'],
     exercicio: {
-      titulo: 'Um limite, uma frase',
+      titulo: 'Meus inegociáveis',
       passos: [
-        'Pense em uma situação pequena que se repete e te incomoda.',
-        'Transforme em uma frase objetiva: “Quando acontece X, eu me sinto Y. A partir de agora, eu vou Z.”',
-        'Leia a frase em voz alta três vezes, até ela soar natural para você.',
+        'Liste cinco coisas que você não abre mão em uma relação.',
+        'Ao lado de cada uma, escreva uma atitude que mostra isso na prática.',
+        'Circule a que você mais tem deixado de lado e decida voltar a cuidar dela.',
       ],
     },
     proximoPasso: {
       titulo: 'Seus próximos 7 dias',
       passos: [
-        'Dia 1: anote uma situação que te incomodou e você não falou.',
-        'Dia 2: transforme essa situação em uma frase curta e gentil.',
-        'Dia 3: pratique um "não" pequeno, sem se justificar demais.',
-        'Dia 4: peça ajuda para uma tarefa que você sempre faz sozinha.',
-        'Dia 5: observe como você se sentiu depois de se posicionar.',
-        'Dia 6: escolha um limite que você quer manter daqui para frente.',
-        'Dia 7: escreva o que mudou quando você usou a sua voz.',
+        'Dia 1: escreva como você gostaria de se sentir em uma relação.',
+        'Dia 2: liste três atitudes que mostram, de verdade, que alguém se importa com você.',
+        'Dia 3: faça algo gostoso sozinha, sem esperar companhia.',
+        'Dia 4: escreva o que você precisa e ainda não pediu (ou ainda não se deu).',
+        'Dia 5: converse com calma sobre um tema importante, começando com "eu sinto".',
+        'Dia 6: observe atitudes, não só palavras, de quem está ao seu lado.',
+        'Dia 7: escreva o que você aprendeu sobre você nesta semana.',
       ],
     },
   },
   C: {
     acolhimento:
-      'Obrigada pela sua honestidade. Reconhecer a carência não é fraqueza — é o primeiro passo para escolher com mais calma.',
+      'Dá para sentir o tamanho do seu cuidado com quem você ama. Agora é hora de esse cuidado chegar até você também.',
     sinaliza: [
-      'Quando a atenção recebida parece rara, qualquer sinal pode ganhar um peso enorme.',
-      'Seu próximo passo é desacelerar e observar consistência: atitudes que se repetem dizem mais do que mensagens soltas.',
+      'Talvez você seja a pessoa que segura tudo em casa e, no meio de tantas demandas, o seu tempo e o seu descanso acabem ficando por último.',
+      'Cuidar de quem você ama também inclui cuidar de você. Uma mulher que se cuida tem mais paciência, presença e alegria para dividir.',
     ],
-    forcas: ['Você é capaz de se entregar e sentir profundamente', 'Você já percebe o padrão', 'Existe coragem para olhar para o medo de ficar só'],
+    forcas: ['Você cuida com muito amor', 'Sua família pode contar com você', 'Você quer uma casa com mais leveza'],
     exercicio: {
-      titulo: 'Fato ou expectativa?',
+      titulo: 'Um momento só seu',
       passos: [
-        'Pense em alguém (ou em uma situação) que ocupa muito espaço na sua cabeça.',
-        'Divida uma folha em duas colunas: “o que ele realmente fez” e “o que eu imaginei”.',
-        'Releia as colunas e pergunte: quais atitudes reais sustentam essa expectativa?',
+        'Olhe a sua semana e encontre 20 minutos que podem ser só seus.',
+        'Marque esse horário como um compromisso, como faria para um filho.',
+        'Combine com a família que esse tempo é seu, sem culpa.',
       ],
     },
     proximoPasso: {
       titulo: 'Seus próximos 7 dias',
       passos: [
-        'Dia 1: antes de responder uma mensagem que te deixa ansiosa, espere 10 minutos.',
-        'Dia 2: escreva o que você sente quando alguém demora a responder.',
-        'Dia 3: faça algo que te dá prazer sem depender de ninguém.',
-        'Dia 4: liste três atitudes que mostram, de verdade, que alguém se importa com você.',
-        'Dia 5: passe uma hora longe do celular, só com você.',
-        'Dia 6: escreva uma carta curta para a mulher que você quer ser.',
-        'Dia 7: releia a carta e escolha uma atitude para manter.',
+        'Dia 1: anote tudo o que você faz por todos em um dia comum.',
+        'Dia 2: escolha uma tarefa para pedir ajuda ou dividir.',
+        'Dia 3: tenha 15 minutos de conversa sem celular com alguém da família.',
+        'Dia 4: faça uma refeição com calma, sentada e sem pressa.',
+        'Dia 5: diga "não" a um pedido que você faria só por obrigação.',
+        'Dia 6: faça algo que te dá prazer, só para você.',
+        'Dia 7: escreva como foi colocar você também na lista de cuidados.',
       ],
     },
   },
-  A: {
-    acolhimento: 'Você está sendo convidada a olhar para a vida com mais clareza — e isso é sinal de maturidade.',
+  D: {
+    acolhimento:
+      'Querer crescer é lindo. Você está olhando para o seu trabalho e o seu dinheiro com vontade de mais, e isso é força.',
     sinaliza: [
-      'Química e intensidade podem existir, mas construção depende de valores, responsabilidade, respeito e compatibilidade.',
-      'O convite agora é olhar para a pessoa e para a relação como elas são hoje, e não apenas para o potencial.',
+      'Talvez você sinta que pode mais do que está vivendo hoje, ou que o dinheiro e o trabalho estão trazendo mais preocupação do que realização.',
+      'Você não precisa pedir licença para crescer. Autoestima também aparece na forma como você valoriza o seu tempo, o seu talento e o seu dinheiro.',
     ],
-    forcas: ['Você sabe sentir e se encantar', 'Existe abertura para aprender a escolher melhor', 'Você quer decisões mais conscientes'],
+    forcas: ['Você tem vontade de crescer', 'Você sabe trabalhar duro', 'Você quer mais segurança e independência'],
     exercicio: {
-      titulo: 'Meus inegociáveis',
+      titulo: 'O meu valor',
       passos: [
-        'Liste cinco valores que você não abre mão em uma relação.',
-        'Ao lado de cada um, escreva uma atitude concreta que mostra esse valor na prática.',
-        'Guarde essa lista e consulte antes de tomar decisões afetivas importantes.',
+        'Escreva três coisas que você faz muito bem no trabalho ou na vida.',
+        'Ao lado de cada uma, escreva quem já se beneficiou disso.',
+        'Escolha uma e pense em como ela pode te trazer mais reconhecimento ou renda.',
       ],
     },
     proximoPasso: {
       titulo: 'Seus próximos 7 dias',
       passos: [
-        'Dia 1: liste cinco valores que você não abre mão.',
-        'Dia 2: escreva como você se sente quando está perto das pessoas que ama.',
-        'Dia 3: observe se suas escolhas desta semana combinam com seus valores.',
-        'Dia 4: pense em quem você se torna ao lado de cada pessoa próxima.',
-        'Dia 5: anote um sinal que você costuma ignorar e decida observá-lo.',
-        'Dia 6: converse com alguém de confiança sobre o que você quer para o seu futuro.',
-        'Dia 7: escreva uma frase que resuma o tipo de vida que você está escolhendo.',
+        'Dia 1: escreva onde você quer estar profissionalmente daqui a um ano.',
+        'Dia 2: anote para onde foi o seu dinheiro nos últimos 7 dias.',
+        'Dia 3: separe um valor, mesmo pequeno, só para você ou para uma reserva.',
+        'Dia 4: aprenda algo novo por 20 minutos sobre a sua área.',
+        'Dia 5: converse com alguém que já está onde você quer chegar.',
+        'Dia 6: dê um passo concreto: um contato, um curso, uma proposta.',
+        'Dia 7: escreva o que você descobriu sobre o seu valor nesta semana.',
       ],
     },
   },
   E: {
-    acolhimento: 'Olhar com honestidade para a própria relação exige coragem. Você está fazendo isso agora.',
+    acolhimento:
+      'Que bom que você olhou para o seu corpo com honestidade. Ele te acompanha em tudo e merece esse carinho.',
     sinaliza: [
-      'Uma relação saudável não precisa ser perfeita, mas não deve manter você em dúvida e medo permanentes.',
-      'Observe se existe abertura para conversar, assumir responsabilidades e mudar atitudes de forma consistente.',
+      'Talvez, com tantas responsabilidades, o cuidado com o corpo, o sono, a alimentação e o movimento tenham ficado para quando sobrar tempo.',
+      'Seu corpo é a sua casa. Cuidar dele não é vaidade nem obrigação: é uma forma de dizer para você mesma que você importa.',
     ],
-    forcas: ['Você valoriza parceria e reciprocidade', 'Existe disposição para conversar', 'Você não quer se acostumar com o que te machuca'],
+    forcas: ['Você quer se sentir bem na própria pele', 'Você reconhece o que precisa mudar', 'Você está disposta a recomeçar'],
     exercicio: {
-      titulo: 'O termômetro da semana',
+      titulo: 'Escuta do corpo',
       passos: [
-        'Durante uma semana, anote todo dia: “hoje eu me senti mais segura ou mais em dúvida?”',
-        'Ao lado, escreva o que aconteceu para você se sentir assim.',
-        'No fim da semana, observe o padrão — atitudes falam mais do que promessas.',
+        'Feche os olhos e perceba onde o seu corpo está cansado ou tenso.',
+        'Escolha um cuidado simples para hoje: água, alongamento, uma caminhada ou dormir mais cedo.',
+        'Faça agora a primeira parte desse cuidado, mesmo que pequena.',
       ],
     },
     proximoPasso: {
       titulo: 'Seus próximos 7 dias',
       passos: [
-        'Dia 1: anote um momento em que você se sentiu segura na relação.',
-        'Dia 2: anote um momento em que você sentiu dúvida.',
-        'Dia 3: escreva o que você precisa e ainda não pediu.',
-        'Dia 4: escolha um tema para conversar com calma.',
-        'Dia 5: tenha essa conversa usando "eu sinto" e "eu preciso".',
-        'Dia 6: observe as atitudes depois da conversa, não só as promessas.',
-        'Dia 7: escreva o que você aprendeu sobre você nesta semana.',
+        'Dia 1: beba água ao acordar e repare em como você se sente.',
+        'Dia 2: caminhe ou se movimente por 15 minutos.',
+        'Dia 3: durma 30 minutos mais cedo do que o habitual.',
+        'Dia 4: prepare uma refeição colorida, com calma.',
+        'Dia 5: faça um alongamento de 5 minutos antes de dormir.',
+        'Dia 6: marque aquele exame ou consulta que está adiando.',
+        'Dia 7: escreva como o seu corpo respondeu a esses cuidados.',
+      ],
+    },
+  },
+  F: {
+    acolhimento:
+      'Reconhecer que a cabeça anda cheia é um passo importante. Você não precisa dar conta de tudo sozinha.',
+    sinaliza: [
+      'Talvez a ansiedade, o cansaço ou as preocupações estejam ocupando tanto espaço que fica difícil descansar e aproveitar o que é bom.',
+      'Paz não é a ausência de problemas, é voltar para você. Pequenas pausas e limites claros já fazem diferença no dia a dia.',
+    ],
+    forcas: ['Você sente tudo com intensidade', 'Você está buscando equilíbrio', 'Você tem coragem de pedir mais leveza'],
+    exercicio: {
+      titulo: 'Respiração da pausa',
+      passos: [
+        'Inspire contando até quatro, segure por quatro e solte contando até seis.',
+        'Repita cinco vezes, com a mão no peito.',
+        'Escreva em uma frase o que está pesando agora e o que está ao seu alcance fazer hoje.',
+      ],
+    },
+    proximoPasso: {
+      titulo: 'Seus próximos 7 dias',
+      passos: [
+        'Dia 1: faça a respiração da pausa ao acordar.',
+        'Dia 2: escreva tudo o que está na sua cabeça, sem filtro, por 10 minutos.',
+        'Dia 3: fique uma hora longe do celular.',
+        'Dia 4: escolha uma preocupação e defina um primeiro passo pequeno para ela.',
+        'Dia 5: converse com alguém de confiança sobre como você está.',
+        'Dia 6: faça algo que te acalma: música, oração, banho demorado.',
+        'Dia 7: escreva o que trouxe mais paz para você nesta semana.',
       ],
     },
   },
@@ -149,12 +181,11 @@ const TEXTOS = {
 
 export function devolutivaPadrao({ perfil, complementar, nome, orgulho }) {
   const base = TEXTOS[perfil];
-  const p = PERFIS[perfil];
-  const primeiroNome = (nome || '').trim().split(/\s+/)[0];
+    const primeiroNome = (nome || '').trim().split(/\s+/)[0];
   const sinaliza = [...base.sinaliza];
   if (complementar) {
     sinaliza.push(
-      `Seu momento também conversa com a trilha de ${PERFIS[complementar].trilha.toLowerCase()}. ` +
+      `A área de ${PERFIS[complementar].trilha.toLowerCase()} também pede um olhar carinhoso. ` +
         'Elas caminham juntas, e você pode começar pela que fizer mais sentido hoje.',
     );
   }
@@ -167,9 +198,9 @@ export function devolutivaPadrao({ perfil, complementar, nome, orgulho }) {
     exercicio: base.exercicio,
     proximoPasso: base.proximoPasso,
     convite:
-      `Se você quer aprofundar a trilha de ${p.trilha.toLowerCase()}, o e-book da Lívia é o próximo passo: ` +
+      'O e-book da Lívia é o próximo passo para você voltar a se colocar em primeiro lugar: ' +
       'um guia para parar de repetir padrões e aprender a se escolher, com testes e exercícios para fazer no seu ritmo.',
-    fraseFinal: 'A mulher que aprende a escolher não perde tempo. Ela ganha vida.',
+    fraseFinal: 'Seja o grande amor da sua vida.',
     origem: 'padrao',
   };
 }

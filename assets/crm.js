@@ -5,19 +5,19 @@ const ATIVA_MINUTOS = 30;
 
 const NOMES_ETAPA = {
   capa: 'Abriu e não começou',
-  momento: 'Perfil (momento, filhos, vida, prioridade)',
+  momento: 'Perfil (momento, filhos, como se sente)',
   ...Object.fromEntries(BLOCOS.map((b) => [b.id, b.nome])),
-  qualificadoras: 'Renda, mudança e área a melhorar',
+  qualificadoras: 'Renda e área a melhorar',
   cuidado: 'Triagem de cuidado',
   contato: 'Tela de contato',
   resultado: 'Viu o resultado',
 };
 const NOMES_FUNIL = { ...NOMES_ETAPA, capa: 'Abriram o link', resultado: 'Viram o resultado' };
-// etapas que existem no banco mas não estão no quiz de captação (relação e triagem saíram a pedido da Lívia)
-const FORA_DO_QUIZ = ['E', 'cuidado'];
+// etapa que existe no banco mas não está no quiz (a triagem saiu a pedido da Lívia)
+const FORA_DO_QUIZ = ['cuidado'];
 // o que o painel mostra em "Quem é o público"
-const PUBLICO = ['filhos', 'sentimento', 'prioridade', 'renda', 'area'];
-const TITULO_PUBLICO = { filhos: 'Filhos', sentimento: 'Como se sente com a vida', prioridade: 'Maior prioridade', renda: 'Renda mensal', area: 'Área que mais precisa melhorar' };
+const PUBLICO = ['filhos', 'sentimento', 'renda', 'area'];
+const TITULO_PUBLICO = { filhos: 'Filhos', sentimento: 'Como se sente com a vida', renda: 'Renda mensal', area: 'Área que mais precisa melhorar' };
 const resposta = (chave, v) => QUALIFICADORAS[chave]?.opcoes[v]?.replace(/\.$/, '') || '';
 const COR_ETAPA = { A: 'var(--A)', B: 'var(--B)', C: 'var(--C)', D: 'var(--D)', E: 'var(--E)' };
 

@@ -10,85 +10,16 @@ export const ESCALA = [
 ];
 const MAX_ESCALA = 2;
 
-// invertido: pontuação alta indica MAIS necessidade (bloco C — carência).
-// `perguntas` guarda as 25 frases do documento-base (versão completa, para quem já está na comunidade);
-// `curta` é a frase usada no quiz de captação, uma por área.
+// As 6 áreas da vida que o quiz avalia (pedido da Lívia: o quiz aponta qual área precisa de mais atenção).
+// Uma frase por área, sempre positiva: "Sempre" quer dizer que a área está bem, então ninguém cai
+// numa área por responder de forma confiante. Os ids A–F são os mesmos usados nas cores e no funil do CRM.
 export const BLOCOS = [
-  {
-    id: 'A',
-    curta: 1,
-    nome: 'Escolha consciente',
-    rotuloForca: 'Escolha consciente',
-    intro: 'Vamos começar olhando para a forma como você escolhe.',
-    invertido: false,
-    perguntas: [
-      'Quando conheço alguém, observo como essa pessoa trata outras pessoas, não apenas como me trata.',
-      'Antes de me envolver, penso se gosto de quem eu me torno quando estou com essa pessoa.',
-      'Consigo avaliar se nossos valores, objetivos e visão de futuro combinam.',
-      'Percebo quando estou me relacionando com o potencial de alguém, e não com quem essa pessoa é hoje.',
-      'Levo a sério sinais de desrespeito, mentira, controle, manipulação ou irresponsabilidade.',
-    ],
-  },
-  {
-    id: 'B',
-    curta: 1,
-    nome: 'Amor-próprio e identidade',
-    rotuloForca: 'Amor-próprio e identidade',
-    intro: 'Agora, sobre o espaço que você ocupa na sua própria vida.',
-    invertido: false,
-    perguntas: [
-      'Continuo cuidando dos meus sonhos, interesses, amizades e trabalho quando estou em uma relação.',
-      'Consigo reconhecer meu valor mesmo quando não estou recebendo atenção ou aprovação.',
-      'Tenho clareza sobre o que eu ofereço e sobre o que procuro em uma relação.',
-      'Prefiro ficar só por um período a aceitar uma relação que destrói minha paz.',
-      'Consigo tomar decisões importantes sem abandonar quem eu sou para ser escolhida.',
-    ],
-  },
-  {
-    id: 'C',
-    curta: 1,
-    nome: 'Carência e validação',
-    rotuloForca: 'Segurança emocional',
-    intro: 'Algumas frases agora falam de carência e validação. Responda com carinho e honestidade.',
-    invertido: true,
-    perguntas: [
-      'Confundo atenção, elogios ou mensagens esporádicas com prova de conexão profunda.',
-      'Tenho medo de perder alguém mesmo quando a relação não me faz bem.',
-      'Aceito menos do que gostaria porque temo não encontrar outra pessoa.',
-      'Fico ansiosa quando alguém demora a responder ou muda o ritmo de contato.',
-      'Já construí expectativas sobre uma pessoa com base em poucos sinais de afeto.',
-    ],
-  },
-  {
-    id: 'D',
-    curta: 0,
-    nome: 'Limites e comunicação',
-    rotuloForca: 'Limites e comunicação',
-    intro: 'Agora vamos falar de limites e da sua voz nas conversas.',
-    invertido: false,
-    perguntas: [
-      'Sei dizer claramente o que aceito e o que não aceito em uma relação.',
-      'Consigo fazer um pedido direto quando algo me machuca ou incomoda.',
-      'Mantenho a consequência que comuniquei quando um limite é ultrapassado.',
-      'Consigo conversar sobre assuntos difíceis sem me silenciar para evitar conflito.',
-      'Depois de uma conversa, observo mudanças consistentes em atitudes, não apenas promessas.',
-    ],
-  },
-  {
-    id: 'E',
-    curta: 4,
-    nome: 'Disponibilidade e qualidade da relação',
-    rotuloForca: 'Qualidade da relação',
-    intro: 'Por último, sobre a relação que você vive (ou viveu mais recentemente).',
-    invertido: false,
-    perguntas: [
-      'Sinto que existe reciprocidade entre o que ofereço e o que recebo.',
-      'A pessoa com quem me relaciono consegue conversar sobre sentimentos, futuro e responsabilidades.',
-      'Eu sei com clareza o que somos e quais são os acordos da relação.',
-      'Posso discordar sem ser humilhada, ameaçada, punida com silêncio ou desrespeitada.',
-      'A relação me traz mais segurança e parceria do que dúvida constante e ansiedade.',
-    ],
-  },
+  { id: 'A', nome: 'Autoestima', rotuloForca: 'Autoestima', pergunta: 'Eu me olho no espelho e gosto da mulher que vejo.' },
+  { id: 'B', nome: 'Relacionamento', rotuloForca: 'Relacionamento', pergunta: 'Me sinto em paz com a minha vida amorosa, do jeito que ela está hoje.' },
+  { id: 'C', nome: 'Família', rotuloForca: 'Família', pergunta: 'Tenho tempo de qualidade e harmonia com a minha família.' },
+  { id: 'D', nome: 'Carreira e dinheiro', rotuloForca: 'Carreira e dinheiro', pergunta: 'Me sinto realizada e segura com meu trabalho e meu dinheiro.' },
+  { id: 'E', nome: 'Corpo e saúde', rotuloForca: 'Corpo e saúde', pergunta: 'Cuido do meu corpo e da minha saúde com carinho e constância.' },
+  { id: 'F', nome: 'Saúde mental', rotuloForca: 'Saúde mental', pergunta: 'Consigo lidar com a ansiedade e as preocupações sem me perder de mim.' },
 ];
 
 // Perguntas qualificadoras: não entram na pontuação (a área a melhorar só desempata).
@@ -129,18 +60,6 @@ export const QUALIFICADORAS = {
       dificil: 'Passando por um momento difícil.',
     },
   },
-  prioridade: {
-    rotulo: 'Sobre você',
-    pergunta: 'Qual é a sua maior prioridade hoje?',
-    opcoes: {
-      eu: 'Cuidar de mim e da minha autoestima.',
-      familia: 'Minha família e meus filhos.',
-      relacionamento: 'Meu relacionamento amoroso.',
-      carreira: 'Minha carreira e meu dinheiro.',
-      saude: 'Minha saúde e meu corpo.',
-      espiritualidade: 'Minha fé e meu autoconhecimento.',
-    },
-  },
   renda: {
     rotulo: 'Sobre você',
     pergunta: 'Qual é a sua renda mensal?',
@@ -158,12 +77,11 @@ export const QUALIFICADORAS = {
     pergunta: 'Qual área da sua vida mais precisa melhorar agora?',
     opcoes: {
       autoestima: 'Autoestima e amor-próprio.',
-      emocional: 'Equilíbrio emocional (ansiedade, carência).',
-      limites: 'Limites e saber dizer não.',
       relacionamento: 'Relacionamento amoroso.',
       familia: 'Família e filhos.',
       carreira: 'Carreira e dinheiro.',
-      saude: 'Saúde e autocuidado.',
+      saude: 'Corpo e saúde.',
+      emocional: 'Saúde mental (ansiedade, cansaço, preocupações).',
     },
   },
 };
@@ -175,68 +93,69 @@ export const PERGUNTAS_ABERTAS = {
     dica: 'Pode ser uma palavra ou uma frase. É opcional.',
     exemplo: 'Ex.: sou leal, não desisto fácil, cuido bem de quem amo…',
   },
-  mudanca: {
-    pergunta: 'Se a sua vida pudesse mudar em uma coisa nos próximos meses, o que seria?',
-    dica: 'É opcional. O que você escrever serve só para personalizar o seu resultado.',
-    exemplo: 'Escreva aqui, do seu jeito…',
-  },
 };
 export const MAX_TEXTO_ABERTO = 400;
 
-// Ordem do quiz de captação (12 perguntas), pedida pela Lívia: primeiro conhecer a mulher,
-// depois autoestima, e a área a melhorar por último. `etapa` alimenta o funil do CRM
-// (precisa seguir a ordem de supabase/schema.sql: momento, A, B, C, D, qualificadoras).
+// Ordem do quiz de captação (12 perguntas): primeiro conhecer a mulher, depois uma frase por área
+// da vida, e a área que ela sente que mais precisa melhorar por último. `etapa` alimenta o funil
+// do CRM (segue a ordem de supabase/schema.sql: momento, A, B, C, D, E, F, qualificadoras).
 export const ROTEIRO = [
   { tipo: 'qualificadora', chave: 'momento', etapa: 'momento' },
   { tipo: 'qualificadora', chave: 'filhos', etapa: 'momento' },
   { tipo: 'qualificadora', chave: 'sentimento', etapa: 'momento' },
-  { tipo: 'qualificadora', chave: 'prioridade', etapa: 'momento' },
   { tipo: 'escala', bloco: 'A', etapa: 'A' },
+  { tipo: 'aberta', chave: 'orgulho', etapa: 'A' },
   { tipo: 'escala', bloco: 'B', etapa: 'B' },
-  { tipo: 'aberta', chave: 'orgulho', etapa: 'B' },
   { tipo: 'escala', bloco: 'C', etapa: 'C' },
   { tipo: 'escala', bloco: 'D', etapa: 'D' },
+  { tipo: 'escala', bloco: 'E', etapa: 'E' },
+  { tipo: 'escala', bloco: 'F', etapa: 'F' },
   { tipo: 'qualificadora', chave: 'renda', etapa: 'qualificadoras' },
-  { tipo: 'aberta', chave: 'mudanca', etapa: 'qualificadoras' },
   { tipo: 'qualificadora', chave: 'area', etapa: 'qualificadoras' },
 ];
 const BLOCOS_DO_QUIZ = ROTEIRO.filter((t) => t.tipo === 'escala').map((t) => t.bloco);
 
+// Um resultado por área, cada um com a sua frase (pedido da Lívia: nada de frase igual para todas).
 export const PERFIS = {
-  B: {
-    nome: 'A mulher que está se reencontrando',
-    frase: 'Antes de escolher alguém, você está aprendendo a escolher você.',
-    trilha: 'Reencontro',
+  A: {
+    nome: 'A mulher que está voltando a se escolher',
+    frase: 'Antes de qualquer pessoa, você merece a sua própria escolha.',
+    trilha: 'Autoestima',
   },
-  D: {
-    nome: 'A mulher que quer colocar limites',
-    frase: 'Sua voz precisa aparecer nas escolhas e nas conversas.',
-    trilha: 'Limites',
+  B: {
+    nome: 'A mulher que quer amar sem se perder',
+    frase: 'O amor que você procura começa na forma como você se trata.',
+    trilha: 'Relacionamento',
   },
   C: {
-    nome: 'A mulher que quer sair do ciclo da carência',
-    frase: 'Atenção não precisa ser confundida com conexão; você pode escolher com mais calma.',
-    trilha: 'Segurança emocional',
+    nome: 'A mulher que cuida de todos e quer cuidar de si',
+    frase: 'Cuidar de quem você ama também inclui cuidar de você.',
+    trilha: 'Família',
   },
-  A: {
-    nome: 'A mulher que quer enxergar com clareza',
-    frase: 'A maturidade olha para o futuro e observa a realidade, não apenas a intensidade.',
-    trilha: 'Clareza',
+  D: {
+    nome: 'A mulher que quer crescer e prosperar',
+    frase: 'Você não precisa pedir licença para crescer.',
+    trilha: 'Carreira',
   },
   E: {
-    nome: 'A mulher que está avaliando sua relação',
-    frase: 'Consistência, respeito e reciprocidade merecem ser observados nas atitudes.',
-    trilha: 'Relação',
+    nome: 'A mulher que quer voltar a cuidar do próprio corpo',
+    frase: 'Seu corpo é a sua casa, e ele merece atenção e carinho.',
+    trilha: 'Corpo e saúde',
+  },
+  F: {
+    nome: 'A mulher que busca paz por dentro',
+    frase: 'Paz não é a ausência de problemas, é voltar para você.',
+    trilha: 'Saúde mental',
   },
 };
 
 // Ordem usada para desempate exato.
-const PRIORIDADE = ['B', 'D', 'C', 'A', 'E'];
-// Com uma frase por área, a área que ela quer melhorar desempata entre áreas parecidas.
-const AREA_PARA_BLOCO = { autoestima: 'B', emocional: 'C', limites: 'D', relacionamento: 'A' };
+const PRIORIDADE = ['A', 'F', 'B', 'E', 'C', 'D'];
+// A área que ela diz que mais precisa melhorar pesa a favor, e desempata entre áreas parecidas.
+const AREA_PARA_BLOCO = { autoestima: 'A', relacionamento: 'B', familia: 'C', carreira: 'D', saude: 'E', emocional: 'F' };
 const PESO_AREA = 25;
 
-/** Áreas pontuadas no quiz de captação (a qualidade da relação fica para a versão completa). */
+/** Áreas pontuadas no quiz, na ordem do roteiro. */
 export function blocosDoQuiz() {
   return BLOCOS.filter((b) => BLOCOS_DO_QUIZ.includes(b.id));
 }
@@ -265,7 +184,7 @@ export function calcularResultado(respostas, area) {
     if (!Array.isArray(valores) || valores.length !== 1) throw new Error(`Resposta faltando na área ${b.id}`);
     const v = Number(valores[0]);
     if (!Number.isInteger(v) || v < 0 || v > MAX_ESCALA) throw new Error(`Resposta inválida na área ${b.id}`);
-    const forca = Math.round(((b.invertido ? MAX_ESCALA - v : v) / MAX_ESCALA) * 100);
+    const forca = Math.round((v / MAX_ESCALA) * 100);
     const necessidade = 100 - forca + (AREA_PARA_BLOCO[area] === b.id ? PESO_AREA : 0);
     return { id: b.id, nome: b.rotuloForca, forca, nivel: nivelDaForca(forca), necessidade };
   });

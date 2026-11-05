@@ -2,7 +2,7 @@
 import { registrar } from './_supabase.js';
 
 const EVENTOS = new Set(['visita', 'inicio', 'etapa', 'pdf', 'comunidade']);
-const ETAPAS = new Set(['capa', 'momento', 'A', 'B', 'C', 'D', 'E', 'qualificadoras', 'cuidado', 'contato', 'resultado']);
+const ETAPAS = new Set(['capa', 'momento', 'A', 'B', 'C', 'D', 'E', 'F', 'qualificadoras', 'cuidado', 'contato', 'resultado']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const curto = (v, max = 120) => (typeof v === 'string' ? v.slice(0, max) : undefined);
 const inteiro = (v) => (Number.isInteger(v) && v >= 0 && v < 1000 ? v : undefined);
